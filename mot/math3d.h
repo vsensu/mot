@@ -1,3 +1,6 @@
+/*
+ * Copyright (C) 2020, vsensu 
+ */
 #pragma once
 
 #include <array>
