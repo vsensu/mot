@@ -8,12 +8,8 @@
 // Store the handle of the vertex buffer object.
 GLuint VBO;
 
-// render event callback function
-void RenderSceneCB()
+void RenderPoint()
 {
-    // The only thing we do in our render function is to clear the frame buffer (using the color specified above - try changing it)
-    glClear(GL_COLOR_BUFFER_BIT);
-
 	// In the shaders tutorial you will see that vertex attributes used in the shader (position, normal, etc)
 	// have an index mapped to them that enable you to create the binding between the data in the C/C++ program
 	// and the attribute name inside the shader. In addition you must also enable each vertex attribute index.
@@ -43,7 +39,7 @@ void RenderSceneCB()
 	// The last parameter is useful in the case of the previous example.
 	// We need to specify the offset inside the structure where the pipeline will find our attribute.
 	// In the case of the structure with the position and normal the offset of the position is zero while the offset of the normal is 12.
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
 	// Finally, we make the call to draw the geometry. All the commands that we've seen so far are important but
 	// they only set the stage for the draw command. This is where the GPU really starts to work.
@@ -71,15 +67,36 @@ void RenderSceneCB()
 	// It is good practice to disable each vertex attribute when it is not immediately used.
 	// Leaving it enabled when a shader is not using it is a sure way of asking for trouble.
 	glDisableVertexAttribArray(0);
-
-	// swap the roles of the back buffer and the front buffer.
-    glutSwapBuffers();
 }
 
-void CreateVertexBuffer()
+void RenderTriangle()
+{
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+	// We draw triangles instead of points and we draw 3 vertices instead of 1.
+	glDrawArrays(GL_TRIANGLES, 0, 3);
+	glDisableVertexAttribArray(0);
+}
+
+// render event callback function
+void RenderSceneCB()
+{
+	// The only thing we do in our render function is to clear the frame buffer (using the color specified above - try changing it)
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	// Do render stuff here...
+	//RenderPoint();
+	RenderTriangle();
+
+	// swap the roles of the back buffer and the front buffer.
+	glutSwapBuffers();
+}
+
+void CreateVertexBuffer_Point()
 {
 	// Create an array of vector and initialize to be zero. This will make the dot appear at the middle of the screen
-	std::array<Vector3F, 1> vertices = {Vector3F(0.f, 0.f, 0.f)};
+	std::array<Vector3F, 1> vertices = { Vector3F(0.f, 0.f, 0.f) };
 
 	// OpenGL defines several glGen* functions for generating objects of various types.
 	// They often take two parameters - the first one specifies the number of objects you want to create
@@ -104,36 +121,51 @@ void CreateVertexBuffer()
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices.data(), GL_STATIC_DRAW);
 }
 
-int main(int argc, char ** argv)
+void CreateVertexBuffer_Triangle()
 {
-    glutInit(&argc, argv);
-    
-    //  enables double buffering (drawing to a background buffer while another buffer is displayed) and the color buffer
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
-    
-    glutInitWindowSize(480, 320);
-    glutInitWindowPosition(100, 100);
-	glutCreateWindow("Tutorial 01");
-    
-    // render callback
-    glutDisplayFunc(RenderSceneCB);
+	// We extended the array to contain three vertices.
+	std::array vertices = {
+		Vector3F(-1.f, -1.f, 0.f),
+		Vector3F(1.f, -1.f, 0.f),
+		Vector3F(0.f, 1.f, 0.f),
+	};
 
-    // initialize GLEW and check for any errors. This must be done after GLUT has been initialized.
-    const GLenum res = glewInit();
+	glGenBuffers(1, &VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices.data(), GL_STATIC_DRAW);
+}
+
+int main(int argc, char** argv)
+{
+	glutInit(&argc, argv);
+
+	//  enables double buffering (drawing to a background buffer while another buffer is displayed) and the color buffer
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
+
+	glutInitWindowSize(480, 320);
+	glutInitWindowPosition(100, 100);
+	glutCreateWindow("Tutorial 01");
+
+	// render callback
+	glutDisplayFunc(RenderSceneCB);
+
+	// initialize GLEW and check for any errors. This must be done after GLUT has been initialized.
+	const GLenum res = glewInit();
 	if (res != GLEW_OK)
 	{
 		std::cerr << glewGetErrorString(res) << std::endl;
 		return 1;
 	}
-    
+
 	// set the color that will be used when clearing the frame buffer
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
 	// Create vertex buffer and bind data
-	CreateVertexBuffer();
-    
-    // passes control to GLUT which now begins its own internal loop
-    glutMainLoop();
-  
-    return 0;
+	//CreateVertexBuffer_Point();
+	CreateVertexBuffer_Triangle();
+
+	// passes control to GLUT which now begins its own internal loop
+	glutMainLoop();
+
+	return 0;
 }
