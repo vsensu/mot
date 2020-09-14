@@ -195,7 +195,7 @@ struct ExampleShader : public Example
 
 		glBindVertexArray(0);
 		
-		shader = std::make_shared<Shader>("core.vs", "core.frag");
+		shader = std::make_shared<Shader>("vs.sl", "fs.sl");
 	}
 	void Render() override
 	{
