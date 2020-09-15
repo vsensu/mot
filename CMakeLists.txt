@@ -4,6 +4,7 @@ project(mot)
 set(CMAKE_CXX_STANDARD 17)
 
 include_directories(
+        src
         deps/FreeGLUT-3.2.1/include
         deps/glew-2.1.0/include
 )
@@ -18,7 +19,8 @@ link_directories(
 #aux_source_directory(. DIRS_SRCS)
 
 #add_executable(mot src/main.cpp ${DIRS_SRCS} src/Examples/Shaders/Shader.h src/math3d.h)
-add_executable(mot src/main.cpp src/Examples/Shaders/Shader.h src/math3d.h)
+add_executable(mot src/main.cpp src/Examples/Shaders/Shader.h src/math3d.h src/Examples/Shaders/ExampleShader.h
+        src/Examples/IExample.h src/Examples/Point/ExampleRenderPoint.h src/Examples/Triangle/ExampleRenderTriangle.h)
 
 target_link_libraries(mot
         freeglutd
