@@ -27,9 +27,13 @@ target_link_libraries(mot
         glew32
         )
 
-#configure_file(deps/glew/dll/glew32.dll ${RUNTIME_OUTPUT_DIRECTORY}/glew32.dll COPYONLY)
-file(COPY deps/FreeGLUT-3.2.1/dll/freeglutd.dll DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(COPY deps/FreeGLUT-3.2.1/dll/freeglut.dll DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(COPY deps/glew-2.1.0/dll/glew32.dll DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(COPY src/Examples/Shaders/vs.glsl DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(COPY src/Examples/Shaders/fs.glsl DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+add_custom_command(TARGET mot
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/deps/FreeGLUT-3.2.1/dll/freeglutd.dll ${CMAKE_CURRENT_BINARY_DIR}/freeglutd.dll
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/deps/FreeGLUT-3.2.1/dll/freeglut.dll ${CMAKE_CURRENT_BINARY_DIR}/freeglut.dll
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/deps/glew-2.1.0/dll/glew32.dll ${CMAKE_CURRENT_BINARY_DIR}/glew32.dll
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/src/Examples/Shaders/vs.glsl ${CMAKE_CURRENT_BINARY_DIR}/vs.glsl
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/src/Examples/Shaders/fs.glsl ${CMAKE_CURRENT_BINARY_DIR}/fs.glsl
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/src/Examples/Shaders/uvs.glsl ${CMAKE_CURRENT_BINARY_DIR}/uvs.glsl
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/src/Examples/Shaders/ufs.glsl ${CMAKE_CURRENT_BINARY_DIR}/ufs.glsl
+        )
