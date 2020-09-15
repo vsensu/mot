@@ -33,4 +33,8 @@ struct Vector3 : public Vector<T, 3>
 using Vector3F = Vector3<float>;
 using Vector3I = Vector3<int>;
 
+struct Matrix4F {
+    float m[4][4];
+};
+
 #endif //MOT_MATH3D_H

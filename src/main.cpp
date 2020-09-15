@@ -12,6 +12,7 @@
 #include "Examples/Triangle/ExampleRenderTriangle.h"
 #include "Examples/Shaders/ExampleShader.h"
 #include "Examples/Shaders/ExampleUniformVariables.h"
+#include "Examples/Shaders/ExampleTranslationTransformation.h"
 
 constexpr std::size_t InvalidExampleID = 0;
 std::size_t example_id = InvalidExampleID;
@@ -21,6 +22,7 @@ static std::map<std::size_t, std::shared_ptr<IExample>> examples = {
         {2, std::make_shared<ExampleRenderTriangle>()},
         {3, std::make_shared<ExampleShader>()},
         {4, std::make_shared<ExampleUniformVariables>()},
+        {5, std::make_shared<ExampleTranslationTransformation>()},
 };
 
 // Render event callback function
