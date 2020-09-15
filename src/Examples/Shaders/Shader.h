@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <cassert>
 
 #include <GL/glew.h>
 

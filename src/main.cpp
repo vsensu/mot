@@ -11,6 +11,7 @@
 #include "Examples/Point/ExampleRenderPoint.h"
 #include "Examples/Triangle/ExampleRenderTriangle.h"
 #include "Examples/Shaders/ExampleShader.h"
+#include "Examples/Shaders/ExampleUniformVariables.h"
 
 constexpr std::size_t InvalidExampleID = 0;
 std::size_t example_id = InvalidExampleID;
@@ -19,6 +20,7 @@ static std::map<std::size_t, std::shared_ptr<IExample>> examples = {
         {1, std::make_shared<ExampleRenderPoint>()},
         {2, std::make_shared<ExampleRenderTriangle>()},
         {3, std::make_shared<ExampleShader>()},
+        {4, std::make_shared<ExampleUniformVariables>()},
 };
 
 // Render event callback function
@@ -35,6 +37,8 @@ void RenderSceneCB()
 
     // swap the roles of the back buffer and the front buffer.
     glutSwapBuffers();
+
+//    glutPostRedisplay();
 }
 
 
@@ -62,6 +66,8 @@ int main(int argc, char** argv)
 
     // Render callback
     glutDisplayFunc(RenderSceneCB);
+    // Idle
+    glutIdleFunc(RenderSceneCB);
 
     // Initialize GLEW and check for any errors. This must be done after GLUT has been initialized.
     const GLenum res = glewInit();
