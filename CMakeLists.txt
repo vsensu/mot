@@ -20,7 +20,7 @@ link_directories(
 
 #add_executable(mot src/main.cpp ${DIRS_SRCS} src/Examples/Shaders/Shader.h src/math3d.h)
 add_executable(mot src/main.cpp src/Examples/Shaders/Shader.h src/math3d.h src/Examples/Shaders/ExampleShader.h
-        src/Examples/IExample.h src/Examples/Point/ExampleRenderPoint.h src/Examples/Triangle/ExampleRenderTriangle.h src/Examples/Shaders/ExampleUniformVariables.h src/Examples/Shaders/TranslationTransformation.h)
+        src/Examples/IExample.h src/Examples/Point/ExampleRenderPoint.h src/Examples/Triangle/ExampleRenderTriangle.h src/Examples/Shaders/ExampleUniformVariables.h src/Examples/Shaders/ExampleTranslationTransformation.h)
 
 target_link_libraries(mot
         freeglutd
