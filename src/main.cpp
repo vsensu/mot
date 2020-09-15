@@ -1,10 +1,5 @@
 #include <iostream>
-#include <map>
-#include <memory>
-#include <string>
 
-//#include <GL/glew.h>
-//#include <GL/glut.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 

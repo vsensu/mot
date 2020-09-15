@@ -8,16 +8,12 @@ add_subdirectory(deps/glfw-3.3.2)
 # .h
 include_directories(
         src
-        deps/FreeGLUT-3.2.1/include
-        deps/glew-2.1.0/include
-        deps/glfw-3.3.2/include
         deps/glad/include
+        deps/glfw-3.3.2/include
 )
 
 # lib folder
 link_directories(
-        deps/FreeGLUT-3.2.1/lib
-        deps/glew-2.1.0/lib
         ${CMAKE_CURRENT_BINARY_DIR}/deps/glfw-3.3.2/src
 )
 
@@ -31,8 +27,6 @@ add_executable(mot src/main.cpp src/Examples/Shaders/Shader.h src/math3d.h src/E
 
 # lib
 target_link_libraries(mot
-        freeglutd
-        glew32
         glfw3
         )
 
