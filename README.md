@@ -1,4 +1,8 @@
-## Configurate GLUT and GLEW
+## Build
+Use CMakeLists tool like Clion.
+
+## Legacy examples
+### Configurate GLUT and GLEW
 
 GLUT: OpenGL Utility Tookit(window, event, io etc). Freeglut is an open source implementation.
 
