@@ -65,41 +65,10 @@ int main()
         return -1;
     }
 
-    // 顶点数据
-    float vertices[] = {
-            0.5f, 0.5f, 0.0f,   // 右上角
-            0.5f, -0.5f, 0.0f,  // 右下角
-            -0.5f, -0.5f, 0.0f, // 左下角
-            -0.5f, 0.5f, 0.0f   // 左上角
-    };
-
-    unsigned int indices[] = { // 注意索引从0开始!
-            0, 1, 3, // 第一个三角形
-            1, 2, 3  // 第二个三角形
-    };
-
-    // 顶点缓冲对象
-    GLuint VBO;
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    // 顶点数组对象
-    GLuint VAO;
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    constexpr GLuint locationIndex = 0;
-    constexpr GLint vertexCount = 3;
-    glVertexAttribPointer(locationIndex, vertexCount, GL_FLOAT, GL_FALSE, vertexCount * sizeof(float), nullptr);
-    glEnableVertexAttribArray(locationIndex);
-
-    // 索引缓冲对象
-    GLuint EBO;
-    glGenBuffers(1, &EBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    // clear时填充色
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    // 线框模式
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     // 顶点着色器
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -141,9 +110,45 @@ int main()
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 
-    // clear时填充色
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    // 顶点数据
+    float vertices[] = {
+            0.5f, 0.5f, 0.0f,   // 右上角
+            0.5f, -0.5f, 0.0f,  // 右下角
+            -0.5f, -0.5f, 0.0f, // 左下角
+            -0.5f, 0.5f, 0.0f   // 左上角
+    };
+
+    unsigned int indices[] = { // 注意索引从0开始!
+            0, 1, 3, // 第一个三角形
+            1, 2, 3  // 第二个三角形
+    };
+
+    // 顶点数组对象, 顶点缓冲对象, 索引缓冲对象
+    GLuint VAO, VBO, EBO;
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
+
+    // 绑定
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    constexpr GLuint locationIndex = 0;
+    constexpr GLint vertexCount = 3;
+    glVertexAttribPointer(locationIndex, vertexCount, GL_FLOAT, GL_FALSE, vertexCount * sizeof(float), nullptr);
+    glEnableVertexAttribArray(locationIndex);
+
+    // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    // remember: do NOT unbind the EBO while a VAO is active as the bound element buffer object IS stored in the VAO; keep the EBO bound.
+    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+    // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
+    // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
+    glBindVertexArray(0);
 
     // 主循环
     // -----------
@@ -158,7 +163,8 @@ int main()
 
         // 当我们渲染一个物体时要使用着色器程序
         glUseProgram(shaderProgram);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        // 当只有单个VAO时，不用每帧都绑定
+        glBindVertexArray(VAO);
         // 绘制物体
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
@@ -168,6 +174,13 @@ int main()
         // 事件
         glfwPollEvents();
     }
+
+    // optional: de-allocate all resources once they've outlived their purpose:
+    // ------------------------------------------------------------------------
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
+    glDeleteProgram(shaderProgram);
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
