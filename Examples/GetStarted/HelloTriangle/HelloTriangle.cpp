@@ -82,10 +82,13 @@ int main()
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    constexpr GLuint locationIndex = 0;
-    constexpr GLint vertexCount = 3;
-    glVertexAttribPointer(locationIndex, vertexCount, GL_FLOAT, GL_FALSE, vertexCount * sizeof(float), nullptr);
-    glEnableVertexAttribArray(locationIndex);
+    constexpr GLuint posLocation = 0;
+    constexpr GLint posFloatCount = 3;
+    constexpr GLint vertexFloatCount = posFloatCount;
+    // 定义OpenGL如何理解该顶点数据
+    glVertexAttribPointer(posLocation, posFloatCount, GL_FLOAT, GL_FALSE,  vertexFloatCount * sizeof(float), nullptr);
+    // 启用顶点属性 顶点属性默认是禁用的
+    glEnableVertexAttribArray(posLocation);
 
     // 顶点着色器
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -145,7 +148,7 @@ int main()
         glUseProgram(shaderProgram);
         glBindVertexArray(VAO);
         // 绘制物体
-        glDrawArrays(GL_TRIANGLES, 0, vertexCount);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
 
         // glfw: 交换双缓冲
         // -------------------------------------------------------------------------------

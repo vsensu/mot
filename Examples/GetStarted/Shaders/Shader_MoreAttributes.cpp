@@ -144,10 +144,14 @@ int main()
     constexpr GLint posFloatCount = 3;
     constexpr GLint colorFloatCount = 3;
     constexpr GLint vertexFloatCount = posFloatCount + colorFloatCount;
+    // 定义OpenGL如何理解该顶点数据
     glVertexAttribPointer(posLocation, posFloatCount, GL_FLOAT, GL_FALSE,  vertexFloatCount * sizeof(float), nullptr);
+    // 启用顶点属性 顶点属性默认是禁用的
     glEnableVertexAttribArray(posLocation);
     constexpr GLuint colorLocation = 1;
-    glVertexAttribPointer(colorLocation, colorFloatCount, GL_FLOAT, GL_FALSE, vertexFloatCount * sizeof(float), (void*)(colorFloatCount*sizeof(float)));
+    // 定义OpenGL如何理解该顶点数据
+    glVertexAttribPointer(colorLocation, colorFloatCount, GL_FLOAT, GL_FALSE, vertexFloatCount * sizeof(float), (void*)(posFloatCount*sizeof(float)));
+    // 启用顶点属性 顶点属性默认是禁用的
     glEnableVertexAttribArray(colorLocation);
 
     // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
