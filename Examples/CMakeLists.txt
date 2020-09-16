@@ -3,6 +3,7 @@
 include_directories(
         ${PROJECT_SOURCE_DIR}/deps/glad/include
         ${PROJECT_SOURCE_DIR}/deps/glfw-3.3.2/include
+        ${PROJECT_SOURCE_DIR}/deps/stb_image
 )
 
 # lib folder
@@ -18,6 +19,10 @@ add_executable(ShaderInOut WIN32 GetStarted/Shaders/Shader_InOut.cpp ${PROJECT_S
 add_executable(ShaderUniform WIN32 GetStarted/Shaders/Shader_Uniform.cpp ${PROJECT_SOURCE_DIR}/deps/glad/src/glad.c)
 add_executable(ShaderMoreAttributes WIN32 GetStarted/Shaders/Shader_MoreAttributes.cpp ${PROJECT_SOURCE_DIR}/deps/glad/src/glad.c)
 add_executable(ShaderFile WIN32 GetStarted/Shaders/Shader_File.cpp GetStarted/Shaders/Shader.h ${PROJECT_SOURCE_DIR}/deps/glad/src/glad.c)
+add_executable(HelloTexture WIN32 GetStarted/Textures/HelloTexture.cpp GetStarted/Shaders/Shader.h
+        ${PROJECT_SOURCE_DIR}/deps/glad/src/glad.c ${PROJECT_SOURCE_DIR}/deps/stb_image/stb_image.cpp)
+add_executable(TexturesCombined WIN32 GetStarted/Textures/TexturesCombined.cpp GetStarted/Shaders/Shader.h
+        ${PROJECT_SOURCE_DIR}/deps/glad/src/glad.c ${PROJECT_SOURCE_DIR}/deps/stb_image/stb_image.cpp)
 
 ## lib
 target_link_libraries(HelloWindow
@@ -41,8 +46,15 @@ target_link_libraries(ShaderMoreAttributes
 target_link_libraries(ShaderFile
         glfw3
         )
+target_link_libraries(HelloTexture
+        glfw3
+        )
+target_link_libraries(TexturesCombined
+        glfw3
+        )
 
-set(GUI_ONLY_BINARIES HelloWindow HelloTriangle HelloRectangle ShaderInOut ShaderUniform ShaderMoreAttributes ShaderFile)
+set(GUI_ONLY_BINARIES HelloWindow HelloTriangle HelloRectangle ShaderInOut ShaderUniform ShaderMoreAttributes ShaderFile
+        HelloTexture TexturesCombined)
 if (MSVC)
     # Tell MSVC to use main instead of WinMain for Windows subsystem executables
     set_target_properties(${GUI_ONLY_BINARIES} PROPERTIES
@@ -54,4 +66,13 @@ add_custom_command(TARGET ShaderFile
         POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Shaders/vs.glsl ${CMAKE_CURRENT_BINARY_DIR}/vs.glsl
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Shaders/fs.glsl ${CMAKE_CURRENT_BINARY_DIR}/fs.glsl
+        )
+add_custom_command(TARGET HelloTexture
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/container.jpg ${CMAKE_CURRENT_BINARY_DIR}/container.jpg
+        )
+add_custom_command(TARGET TexturesCombined
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/container.jpg ${CMAKE_CURRENT_BINARY_DIR}/container.jpg
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/awesomeface.png ${CMAKE_CURRENT_BINARY_DIR}/awesomeface.png
         )
