@@ -8,9 +8,8 @@
 
 #include <glad/glad.h>
 
-class ShaderUtils
+struct ShaderUtils
 {
-public:
     static GLuint CreateShaderProgramFromFile(const std::string& vsPath, const std::string& fsPath)
     {
         // Read vertex shader code from file
@@ -101,17 +100,37 @@ public:
     }
 };
 
+// Policy classes begin
+struct CreateShaderProgramFromFile
+{
+    auto Create(const std::string& vsPath, const std::string& fsPath)
+    {
+        return ShaderUtils::CreateShaderProgramFromFile(vsPath, fsPath);
+    }
+};
+
+struct CreateShaderProgramFromString
+{
+    auto Create(const std::string& vsCode, const std::string& fsCode)
+    {
+        return ShaderUtils::CreateShaderProgramFromString(vsCode, fsCode);
+    }
+};
+// Policy classes end
+
+template <typename CreatePolicy>
 struct Shader
 {
-    GLuint ShaderProgram;
-    Shader(const std::string& vsPath, const std::string& fsPath)
-    : ShaderProgram(ShaderUtils::CreateShaderProgramFromFile(vsPath, fsPath))
+    CreatePolicy createPolicy;
+    GLuint shaderProgram;
+    Shader(const std::string& vs, const std::string& fs)
+    : shaderProgram(createPolicy.Create(vs, fs))
     {
     }
 
     void Use() const
     {
-        glUseProgram(ShaderProgram);
+        glUseProgram(shaderProgram);
     }
 
     template<typename UniformType>
@@ -122,19 +141,19 @@ struct Shader
     template<>
     void SetUniform(const std::string &name, bool value) const
     {
-        glUniform1i(glGetUniformLocation(ShaderProgram, name.c_str()), static_cast<int>(value));
+        glUniform1i(glGetUniformLocation(shaderProgram, name.c_str()), static_cast<int>(value));
     }
 
     template<>
     void SetUniform(const std::string &name, int value) const
     {
-        glUniform1i(glGetUniformLocation(ShaderProgram, name.c_str()), value);
+        glUniform1i(glGetUniformLocation(shaderProgram, name.c_str()), value);
     }
 
     template<>
     void SetUniform(const std::string &name, float value) const
     {
-        glUniform1f(glGetUniformLocation(ShaderProgram, name.c_str()), value);
+        glUniform1f(glGetUniformLocation(shaderProgram, name.c_str()), value);
     }
 
     template<typename UniformType>
@@ -146,7 +165,7 @@ struct Shader
     template<>
     void SetUniform(const std::string &name, float v1, float v2, float v3, float v4)
     {
-        glUniform4f(glGetUniformLocation(ShaderProgram, name.c_str()), v1, v2, v3, v4);
+        glUniform4f(glGetUniformLocation(shaderProgram, name.c_str()), v1, v2, v3, v4);
     }
 };
 

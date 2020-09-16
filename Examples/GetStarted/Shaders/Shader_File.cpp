@@ -53,7 +53,7 @@ int main()
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     // Shaders
-    Shader shader("vs.glsl", "fs.glsl");
+    Shader<CreateShaderProgramFromFile> shader("vs.glsl", "fs.glsl");
 
     // 顶点数据
     float vertices[] = {
