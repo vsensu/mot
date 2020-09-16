@@ -8,10 +8,10 @@
 
 #include <glad/glad.h>
 
-struct Shader
+class ShaderUtils
 {
-    GLuint ShaderProgram;
-    Shader(const std::string& vsPath, const std::string& fsPath)
+public:
+    static GLuint CreateShaderProgramFromFile(const std::string& vsPath, const std::string& fsPath)
     {
         // Read vertex shader code from file
         std::ifstream vShaderFile(vsPath);
@@ -25,7 +25,6 @@ struct Shader
         vertexCode.resize(vShaderFile.tellg());
         vShaderFile.seekg(0);
         vShaderFile.read(vertexCode.data(), vertexCode.size());
-        const GLchar* vShaderCode = vertexCode.c_str();
 
         // Read fragment shader code from file
         std::ifstream fShaderFile(fsPath);
@@ -39,9 +38,14 @@ struct Shader
         fragmentCode.resize(fShaderFile.tellg());
         fShaderFile.seekg(0);
         fShaderFile.read(fragmentCode.data(), fragmentCode.size());
-        const GLchar* fShaderCode = fragmentCode.c_str();
 
+        return CreateShaderProgramFromString(vertexCode, fragmentCode);
+    }
+
+    static GLuint CreateShaderProgramFromString(const std::string& vsCode, const std::string& fsCode)
+    {
         // Compile vertex shader
+        const GLchar* vShaderCode = vsCode.c_str();
         GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
         glShaderSource(vertexShader, 1, &vShaderCode, nullptr);
         glCompileShader(vertexShader);
@@ -55,6 +59,7 @@ struct Shader
         }
 
         // Compile fragment shader
+        const GLchar* fShaderCode = fsCode.c_str();
         GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
         glShaderSource(fragmentShader, 1, &fShaderCode, nullptr);
         glCompileShader(fragmentShader);
@@ -66,7 +71,7 @@ struct Shader
         }
 
         // Create Shader program
-        ShaderProgram = glCreateProgram();
+        GLuint ShaderProgram = glCreateProgram();
         // Attach compiled shader object to the program object.
         // This is very similar to specifying the list of objects for linking in a makefile.
         // Since we don't have a makefile here we emulate this behavior programatically.
@@ -91,6 +96,17 @@ struct Shader
         // Delete the shaders as they're linked into our program now and no longer necessery
         glDeleteShader(vertexShader);
         glDeleteShader(fragmentShader);
+
+        return ShaderProgram;
+    }
+};
+
+struct Shader
+{
+    GLuint ShaderProgram;
+    Shader(const std::string& vsPath, const std::string& fsPath)
+    : ShaderProgram(ShaderUtils::CreateShaderProgramFromFile(vsPath, fsPath))
+    {
     }
 
     void Use() const
