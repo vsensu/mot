@@ -4,6 +4,7 @@ include_directories(
         ${PROJECT_SOURCE_DIR}/deps/glad/include
         ${PROJECT_SOURCE_DIR}/deps/glfw-3.3.2/include
         ${PROJECT_SOURCE_DIR}/deps/stb_image
+        ${PROJECT_SOURCE_DIR}/deps/glm-0.9.9.8
 )
 
 # lib folder
@@ -22,6 +23,8 @@ add_executable(ShaderFile WIN32 GetStarted/Shaders/Shader_File.cpp GetStarted/Sh
 add_executable(HelloTexture WIN32 GetStarted/Textures/HelloTexture.cpp GetStarted/Shaders/Shader.h
         ${PROJECT_SOURCE_DIR}/deps/glad/src/glad.c ${PROJECT_SOURCE_DIR}/deps/stb_image/stb_image.cpp)
 add_executable(TexturesCombined WIN32 GetStarted/Textures/TexturesCombined.cpp GetStarted/Shaders/Shader.h
+        ${PROJECT_SOURCE_DIR}/deps/glad/src/glad.c ${PROJECT_SOURCE_DIR}/deps/stb_image/stb_image.cpp)
+add_executable(HelloTransform WIN32 GetStarted/Transform/HelloTransform.cpp GetStarted/Shaders/Shader.h
         ${PROJECT_SOURCE_DIR}/deps/glad/src/glad.c ${PROJECT_SOURCE_DIR}/deps/stb_image/stb_image.cpp)
 
 ## lib
@@ -52,9 +55,12 @@ target_link_libraries(HelloTexture
 target_link_libraries(TexturesCombined
         glfw3
         )
+target_link_libraries(HelloTransform
+        glfw3
+        )
 
 set(GUI_ONLY_BINARIES HelloWindow HelloTriangle HelloRectangle ShaderInOut ShaderUniform ShaderMoreAttributes ShaderFile
-        HelloTexture TexturesCombined)
+        HelloTexture TexturesCombined HelloTransform)
 if (MSVC)
     # Tell MSVC to use main instead of WinMain for Windows subsystem executables
     set_target_properties(${GUI_ONLY_BINARIES} PROPERTIES
@@ -72,6 +78,11 @@ add_custom_command(TARGET HelloTexture
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/container.jpg ${CMAKE_CURRENT_BINARY_DIR}/container.jpg
         )
 add_custom_command(TARGET TexturesCombined
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/container.jpg ${CMAKE_CURRENT_BINARY_DIR}/container.jpg
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/awesomeface.png ${CMAKE_CURRENT_BINARY_DIR}/awesomeface.png
+        )
+add_custom_command(TARGET HelloTransform
         POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/container.jpg ${CMAKE_CURRENT_BINARY_DIR}/container.jpg
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/awesomeface.png ${CMAKE_CURRENT_BINARY_DIR}/awesomeface.png

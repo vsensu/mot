@@ -156,6 +156,12 @@ struct Shader
         glUniform1f(glGetUniformLocation(shaderProgram, name.c_str()), value);
     }
 
+    template<>
+    void SetUniform(const std::string &name, GLfloat *value) const
+    {
+        glUniformMatrix4fv(glGetUniformLocation(shaderProgram, name.c_str()), 1, GL_FALSE, value);
+    }
+
     template<typename UniformType>
     void SetUniform(const std::string &name, UniformType v1, UniformType v2, UniformType v3, UniformType v4)
     {
