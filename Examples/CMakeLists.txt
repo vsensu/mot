@@ -30,6 +30,10 @@ add_executable(Hello3D WIN32 GetStarted/CoordinateSystem/Hello3D.cpp GetStarted/
         ${PROJECT_SOURCE_DIR}/deps/glad/src/glad.c ${PROJECT_SOURCE_DIR}/deps/stb_image/stb_image.cpp)
 add_executable(Cube WIN32 GetStarted/CoordinateSystem/Cube.cpp GetStarted/Shaders/Shader.h
         ${PROJECT_SOURCE_DIR}/deps/glad/src/glad.c ${PROJECT_SOURCE_DIR}/deps/stb_image/stb_image.cpp)
+add_executable(HelloCamera WIN32 GetStarted/Camera/HelloCamera.cpp GetStarted/Shaders/Shader.h
+        ${PROJECT_SOURCE_DIR}/deps/glad/src/glad.c ${PROJECT_SOURCE_DIR}/deps/stb_image/stb_image.cpp)
+add_executable(GodCamera WIN32 GetStarted/Camera/GodCamera.cpp GetStarted/Shaders/Shader.h
+        ${PROJECT_SOURCE_DIR}/deps/glad/src/glad.c ${PROJECT_SOURCE_DIR}/deps/stb_image/stb_image.cpp)
 
 ## lib
 target_link_libraries(HelloWindow
@@ -68,9 +72,15 @@ target_link_libraries(Hello3D
 target_link_libraries(Cube
         glfw3
         )
+target_link_libraries(HelloCamera
+        glfw3
+        )
+target_link_libraries(GodCamera
+        glfw3
+        )
 
 set(GUI_ONLY_BINARIES HelloWindow HelloTriangle HelloRectangle ShaderInOut ShaderUniform ShaderMoreAttributes ShaderFile
-        HelloTexture TexturesCombined HelloTransform Hello3D Cube)
+        HelloTexture TexturesCombined HelloTransform Hello3D Cube HelloCamera GodCamera)
 if (MSVC)
     # Tell MSVC to use main instead of WinMain for Windows subsystem executables
     set_target_properties(${GUI_ONLY_BINARIES} PROPERTIES
@@ -103,6 +113,16 @@ add_custom_command(TARGET Hello3D
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/awesomeface.png ${CMAKE_CURRENT_BINARY_DIR}/awesomeface.png
         )
 add_custom_command(TARGET Cube
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/container.jpg ${CMAKE_CURRENT_BINARY_DIR}/container.jpg
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/awesomeface.png ${CMAKE_CURRENT_BINARY_DIR}/awesomeface.png
+        )
+add_custom_command(TARGET HelloCamera
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/container.jpg ${CMAKE_CURRENT_BINARY_DIR}/container.jpg
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/awesomeface.png ${CMAKE_CURRENT_BINARY_DIR}/awesomeface.png
+        )
+add_custom_command(TARGET GodCamera
         POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/container.jpg ${CMAKE_CURRENT_BINARY_DIR}/container.jpg
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/awesomeface.png ${CMAKE_CURRENT_BINARY_DIR}/awesomeface.png
