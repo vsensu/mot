@@ -26,6 +26,10 @@ add_executable(TexturesCombined WIN32 GetStarted/Textures/TexturesCombined.cpp G
         ${PROJECT_SOURCE_DIR}/deps/glad/src/glad.c ${PROJECT_SOURCE_DIR}/deps/stb_image/stb_image.cpp)
 add_executable(HelloTransform WIN32 GetStarted/Transform/HelloTransform.cpp GetStarted/Shaders/Shader.h
         ${PROJECT_SOURCE_DIR}/deps/glad/src/glad.c ${PROJECT_SOURCE_DIR}/deps/stb_image/stb_image.cpp)
+add_executable(Hello3D WIN32 GetStarted/CoordinateSystem/Hello3D.cpp GetStarted/Shaders/Shader.h
+        ${PROJECT_SOURCE_DIR}/deps/glad/src/glad.c ${PROJECT_SOURCE_DIR}/deps/stb_image/stb_image.cpp)
+add_executable(Cube WIN32 GetStarted/CoordinateSystem/Cube.cpp GetStarted/Shaders/Shader.h
+        ${PROJECT_SOURCE_DIR}/deps/glad/src/glad.c ${PROJECT_SOURCE_DIR}/deps/stb_image/stb_image.cpp)
 
 ## lib
 target_link_libraries(HelloWindow
@@ -58,9 +62,15 @@ target_link_libraries(TexturesCombined
 target_link_libraries(HelloTransform
         glfw3
         )
+target_link_libraries(Hello3D
+        glfw3
+        )
+target_link_libraries(Cube
+        glfw3
+        )
 
 set(GUI_ONLY_BINARIES HelloWindow HelloTriangle HelloRectangle ShaderInOut ShaderUniform ShaderMoreAttributes ShaderFile
-        HelloTexture TexturesCombined HelloTransform)
+        HelloTexture TexturesCombined HelloTransform Hello3D Cube)
 if (MSVC)
     # Tell MSVC to use main instead of WinMain for Windows subsystem executables
     set_target_properties(${GUI_ONLY_BINARIES} PROPERTIES
@@ -83,6 +93,16 @@ add_custom_command(TARGET TexturesCombined
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/awesomeface.png ${CMAKE_CURRENT_BINARY_DIR}/awesomeface.png
         )
 add_custom_command(TARGET HelloTransform
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/container.jpg ${CMAKE_CURRENT_BINARY_DIR}/container.jpg
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/awesomeface.png ${CMAKE_CURRENT_BINARY_DIR}/awesomeface.png
+        )
+add_custom_command(TARGET Hello3D
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/container.jpg ${CMAKE_CURRENT_BINARY_DIR}/container.jpg
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/awesomeface.png ${CMAKE_CURRENT_BINARY_DIR}/awesomeface.png
+        )
+add_custom_command(TARGET Cube
         POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/container.jpg ${CMAKE_CURRENT_BINARY_DIR}/container.jpg
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/awesomeface.png ${CMAKE_CURRENT_BINARY_DIR}/awesomeface.png
