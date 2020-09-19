@@ -12,10 +12,16 @@
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
+float lastX = 400, lastY = 300;
+float yaw = 0.f, pitch = 0.f, roll = 0.f;
+bool firstMouse = true;
+float fov = 45.f;
 
 glm::vec3 cameraPos = glm::vec3(0.f, 0.f, 3.f);
 glm::vec3 cameraFront = glm::vec3(0.f, 0.f, -1.f);
@@ -86,6 +92,9 @@ int main()
     }
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetScrollCallback(window, scroll_callback);
 
     // glad: load all OpenGL function pointers
     // ---------------------------------------
@@ -223,9 +232,6 @@ int main()
     glUniform1i(glGetUniformLocation(shader.shaderProgram, "texture1"), 0); // 手动设置
     // 将texture2名称 关联到 GL_TEXTURE1 纹理单元
     shader.SetUniform("texture2", 1); // 或者使用着色器类设置
-    // Transform
-    glm::mat4 proj = glm::perspective(glm::radians(45.f), static_cast<float>(width/height), 0.1f, 100.0f);
-    shader.SetUniform("proj", glm::value_ptr(proj));
 
     glm::vec3 cubePositions[] = {
             glm::vec3( 0.0f,  0.0f,  0.0f),
@@ -264,6 +270,9 @@ int main()
         shader.Use();
         // 当只有单个VAO时，不用每帧都绑定
         glBindVertexArray(VAO);
+        // Transform
+        glm::mat4 proj = glm::perspective(glm::radians(fov), static_cast<float>(width/height), 0.1f, 100.0f);
+        shader.SetUniform("proj", glm::value_ptr(proj));
         for(std::size_t i = 0; i < 10; ++i)
         {
             glm::mat4 model = glm::translate(glm::mat4(1.f), cubePositions[i]);
@@ -319,4 +328,47 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     // make sure the viewport matches the new window dimensions; note that width and
     // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
+}
+
+void mouse_callback(GLFWwindow *window, double xpos, double ypos)
+{
+    if(firstMouse)
+    {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos;
+    lastX = xpos;
+    lastY = ypos;
+
+    float sensitivity = 0.05;
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+
+    yaw   += xoffset;
+    pitch += yoffset;
+
+    if(pitch > 89.0f)
+        pitch = 89.0f;
+    if(pitch < -89.0f)
+        pitch = -89.0f;
+
+    glm::vec3 front;
+    front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+    front.y = sin(glm::radians(pitch));
+    front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+    cameraFront = glm::normalize(front);
+}
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    if(fov >= 1.0f && fov <= 45.0f)
+        fov -= yoffset;
+    if(fov <= 1.0f)
+        fov = 1.0f;
+    if(fov >= 45.0f)
+        fov = 45.0f;
 }
