@@ -7,7 +7,6 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <GLFW/glfw3.h>
 
 class Camera
 {
@@ -17,17 +16,28 @@ public:
         return glm::lookAt(pos_, pos_ + forward_, up_);
     }
 
-    void processInput(GLFWwindow *window, double deltaTime)
+    inline void MoveForward(double deltaTime)
     {
         float speed = 2.5f * deltaTime;
-        if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-            pos_ += forward_ * speed;
-        if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-            pos_ -= forward_ * speed;
-        if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-            pos_ -= glm::normalize(glm::cross(forward_, up_)) * speed;
-        if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-            pos_ += glm::normalize(glm::cross(forward_, up_)) * speed;
+        pos_ += forward_ * speed;
+    }
+
+    inline void MoveBackward(double deltaTime)
+    {
+        float speed = 2.5f * deltaTime;
+        pos_ -= forward_ * speed;
+    }
+
+    inline void MoveLeft(double deltaTime)
+    {
+        float speed = 2.5f * deltaTime;
+        pos_ -= glm::normalize(glm::cross(forward_, up_)) * speed;
+    }
+
+    inline void MoveRight(double deltaTime)
+    {
+        float speed = 2.5f * deltaTime;
+        pos_ += glm::normalize(glm::cross(forward_, up_)) * speed;
     }
 
     void MouseCallback(GLFWwindow *window, double xpos, double ypos)
