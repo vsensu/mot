@@ -32,7 +32,7 @@ add_executable(Cube WIN32 GetStarted/CoordinateSystem/Cube.cpp GetStarted/Shader
         ${PROJECT_SOURCE_DIR}/deps/glad/src/glad.c ${PROJECT_SOURCE_DIR}/deps/stb_image/stb_image.cpp)
 add_executable(HelloCamera WIN32 GetStarted/Camera/HelloCamera.cpp GetStarted/Shaders/Shader.h
         ${PROJECT_SOURCE_DIR}/deps/glad/src/glad.c ${PROJECT_SOURCE_DIR}/deps/stb_image/stb_image.cpp)
-add_executable(GodCamera WIN32 GetStarted/Camera/GodCamera.cpp GetStarted/Shaders/Shader.h
+add_executable(GodCamera WIN32 GetStarted/Camera/GodCamera.cpp GetStarted/Shaders/Shader.h GetStarted/Camera/Camera.h
         ${PROJECT_SOURCE_DIR}/deps/glad/src/glad.c ${PROJECT_SOURCE_DIR}/deps/stb_image/stb_image.cpp)
 
 ## lib
