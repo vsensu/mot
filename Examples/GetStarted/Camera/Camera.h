@@ -68,16 +68,27 @@ public:
         return glm::perspective(glm::radians(fov_), aspect, 0.1f, 100.0f);
     }
 
+    void Zoom(double yoffset)
+    {
+        if (fov_ >= 1.0f && fov_ <= 45.0f)
+            fov_ -= yoffset;
+        if (fov_ <= 1.0f)
+            fov_ = 1.0f;
+        if (fov_ >= 45.0f)
+            fov_ = 45.0f;
+    }
+
+
 private:
     glm::vec3 pos_{glm::vec3(0.f, 0.f, 3.f)};
-    glm::vec3 up_ {glm::vec3(0.f, 0.f, -1.f)};
-    glm::vec3 forward_{glm::vec3(0.f, 1.f, 0.f)};
+    glm::vec3 up_ {glm::vec3(0.f, 1.f, 0.f)};
+    glm::vec3 forward_ {glm::vec3(0.f, 0.f, -1.f)};
 
-    float yaw_ = 0.f, pitch_ = 0.f, roll_ = 0.f;
-    float fov_ = 45.f;
+    float yaw_ {0.f}, pitch_ {0.f}, roll_ {0.f};
+    float fov_ {45.f};
 
-    bool first_mouse_ = true;
-    float last_x_ = 400.f, last_y_ = 300.f;
+    bool first_mouse_ {true};
+    float last_x_ {400.f}, last_y_ {300.f};
 };
 
 #endif //MOT_CAMERA_H
