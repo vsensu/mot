@@ -34,6 +34,8 @@ add_executable(HelloCamera WIN32 GetStarted/Camera/HelloCamera.cpp GetStarted/Sh
         ${PROJECT_SOURCE_DIR}/deps/glad/src/glad.c ${PROJECT_SOURCE_DIR}/deps/stb_image/stb_image.cpp)
 add_executable(GodCamera WIN32 GetStarted/Camera/GodCamera.cpp GetStarted/Shaders/Shader.h GetStarted/Camera/Camera.h
         ${PROJECT_SOURCE_DIR}/deps/glad/src/glad.c ${PROJECT_SOURCE_DIR}/deps/stb_image/stb_image.cpp)
+add_executable(Colors WIN32 Lighting/Colors/Colors.cpp GetStarted/Shaders/Shader.h GetStarted/Camera/Camera.h
+        ${PROJECT_SOURCE_DIR}/deps/glad/src/glad.c ${PROJECT_SOURCE_DIR}/deps/stb_image/stb_image.cpp)
 
 ## lib
 target_link_libraries(HelloWindow
@@ -78,9 +80,12 @@ target_link_libraries(HelloCamera
 target_link_libraries(GodCamera
         glfw3
         )
+target_link_libraries(Colors
+        glfw3
+        )
 
 set(GUI_ONLY_BINARIES HelloWindow HelloTriangle HelloRectangle ShaderInOut ShaderUniform ShaderMoreAttributes ShaderFile
-        HelloTexture TexturesCombined HelloTransform Hello3D Cube HelloCamera GodCamera)
+        HelloTexture TexturesCombined HelloTransform Hello3D Cube HelloCamera GodCamera Colors)
 if (MSVC)
     # Tell MSVC to use main instead of WinMain for Windows subsystem executables
     set_target_properties(${GUI_ONLY_BINARIES} PROPERTIES

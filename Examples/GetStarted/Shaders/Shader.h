@@ -163,6 +163,18 @@ struct Shader
     }
 
     template<typename UniformType>
+    void SetUniform(const std::string &name, UniformType v1, UniformType v2, UniformType v3)
+    {
+
+    }
+
+    template<>
+    void SetUniform(const std::string &name, float v1, float v2, float v3)
+    {
+        glUniform3f(glGetUniformLocation(shaderProgram, name.c_str()), v1, v2, v3);
+    }
+
+    template<typename UniformType>
     void SetUniform(const std::string &name, UniformType v1, UniformType v2, UniformType v3, UniformType v4)
     {
 
