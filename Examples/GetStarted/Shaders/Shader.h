@@ -1,5 +1,9 @@
-#ifndef MOT_SHADER_H
-#define MOT_SHADER_H
+//
+// Created by vsensu on 2020/9/20.
+//
+
+#ifndef LEARNCRAFT_SHADER_H
+#define LEARNCRAFT_SHADER_H
 
 #include <iostream>
 #include <fstream>
@@ -7,6 +11,9 @@
 #include <cassert>
 
 #include <glad/glad.h>
+#include <glm/gtc/type_ptr.hpp>
+
+#include "gl_errors.h"
 
 struct ShaderUtils
 {
@@ -133,58 +140,40 @@ struct Shader
         glUseProgram(shaderProgram);
     }
 
-    template<typename UniformType>
-    void SetUniform(const std::string &name, UniformType value) const
+    inline auto GetUniformLocation(const std::string &name)
     {
+        return glGetUniformLocation(shaderProgram, name.c_str());
     }
 
-    template<>
-    void SetUniform(const std::string &name, bool value) const
+    void LoadUniform(const std::string &name, const glm::vec3& vector)
     {
-        glUniform1i(glGetUniformLocation(shaderProgram, name.c_str()), static_cast<int>(value));
+        glCheck(glUniform3fv(GetUniformLocation(name), 1, glm::value_ptr(vector)));
     }
 
-    template<>
-    void SetUniform(const std::string &name, int value) const
+    void LoadUniform(const std::string &name, const glm::ivec3& vector)
     {
-        glUniform1i(glGetUniformLocation(shaderProgram, name.c_str()), value);
+        glCheck(glUniform3iv(glUniform3fv(GetUniformLocation(name), 1, glm::value_ptr(vector))));
     }
 
-    template<>
-    void SetUniform(const std::string &name, float value) const
+    void LoadUniform(const std::string &name, const glm::mat4& matrix)
     {
-        glUniform1f(glGetUniformLocation(shaderProgram, name.c_str()), value);
+        glCheck(glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, glm::value_ptr(matrix)));
     }
 
-    template<>
-    void SetUniform(const std::string &name, GLfloat *value) const
+    void LoadUniform(const std::string &name, GLint value)
     {
-        glUniformMatrix4fv(glGetUniformLocation(shaderProgram, name.c_str()), 1, GL_FALSE, value);
+        glCheck(glUniform1i(GetUniformLocation(name), value));
     }
 
-    template<typename UniformType>
-    void SetUniform(const std::string &name, UniformType v1, UniformType v2, UniformType v3)
+    void LoadUniform(const std::string &name, GLuint value)
     {
-
+        glCheck(glUniform1ui(GetUniformLocation(name), value));
     }
 
-    template<>
-    void SetUniform(const std::string &name, float v1, float v2, float v3)
+    void LoadUniform(const std::string &name, GLfloat value)
     {
-        glUniform3f(glGetUniformLocation(shaderProgram, name.c_str()), v1, v2, v3);
-    }
-
-    template<typename UniformType>
-    void SetUniform(const std::string &name, UniformType v1, UniformType v2, UniformType v3, UniformType v4)
-    {
-
-    }
-
-    template<>
-    void SetUniform(const std::string &name, float v1, float v2, float v3, float v4)
-    {
-        glUniform4f(glGetUniformLocation(shaderProgram, name.c_str()), v1, v2, v3, v4);
+        glCheck(glUniform1f(GetUniformLocation(name), value));
     }
 };
 
-#endif //MOT_SHADER_H
+#endif //LEARNCRAFT_SHADER_H

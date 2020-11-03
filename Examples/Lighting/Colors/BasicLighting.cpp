@@ -7,9 +7,13 @@
 
 #include <iostream>
 #include <string>
+#include <array>
+#include <vector>
 
 #include "../../GetStarted/Shaders/Shader.h"
 #include "../../GetStarted/Camera/Camera.h"
+#define DEBUG_GL_ERRORS
+#include "gl_errors.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
@@ -28,29 +32,149 @@ Camera camera;
 const std::string g_vs_code = R"(
 #version 330 core
 layout (location = 0) in vec3 aPos;
+layout (location = 1) in vec3 aNormal;
 
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 proj;
 
+out vec3 FragPos;
+out vec3 Normal;
+
 void main()
 {
     gl_Position = proj * view * model * vec4(aPos, 1.0);
+    FragPos = vec3(model * vec4(aPos, 1.0));
+    Normal = mat3(transpose(inverse(model))) * aNormal;
 }
 )";
 
 const std::string g_fs_code = R"(
 #version 330 core
-out vec4 FragColor;
+in vec3 FragPos;
+in vec3 Normal;
 
 uniform vec3 objectColor;
 uniform vec3 lightColor;
+uniform vec3 lightPos;
+uniform vec3 viewPos;
+
+out vec4 FragColor;
 
 void main()
 {
-    FragColor = vec4(lightColor * objectColor, 1.0);
+    float ambientStrength = 0.1;
+    vec3 ambient = ambientStrength * lightColor;
+
+    vec3 n = normalize(Normal);
+    vec3 lightDir = normalize(lightPos - FragPos);
+    float diff = max(dot(n, lightDir), 0.0);
+    vec3 diffuse = diff * lightColor;
+
+    float specularStrength = 0.5;
+    vec3 viewDir = normalize(viewPos - FragPos);
+    vec3 reflectDir = reflect(-lightDir, n);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
+    vec3 specular = specularStrength * spec * lightColor;
+
+    vec3 result = (ambient + diffuse + specular) * objectColor;
+    FragColor = vec4(result, 1.0);
 }
 )";
+
+const std::string g_fs_code_light = R"(
+#version 330 core
+in vec3 FragPos;
+in vec3 Normal;
+
+uniform vec3 lightColor;
+
+out vec4 FragColor;
+
+void main()
+{
+    FragColor = vec4(lightColor, 1.0);
+}
+)";
+
+struct MeshFace
+{
+    std::array<float, 12> vertices;
+    glm::vec3 normal; // +x:0 +y:1 +z:2 -x:3 -y:4 -z:5
+};
+
+struct MeshFaces
+{
+    static constexpr MeshFace kFrontFace {
+            {1, 1, 1,
+             0, 1, 1,
+             0, 0, 1,
+             1, 0, 1},
+            {0, 0, 1}};
+
+    static constexpr MeshFace kLeftFace {
+            {0, 1, 1,
+             0, 1, 0,
+             0, 0, 0,
+             0, 0, 1},
+            {-1, 0, 0}};
+    static constexpr MeshFace kBackFace = {
+            {0, 1, 0,
+             1, 1, 0,
+             1, 0, 0,
+             0, 0, 0},
+            {0, 0, -1}};
+
+    static constexpr MeshFace kRightFace = {
+            {1, 1, 0,
+             1, 1, 1,
+             1, 0, 1,
+             1, 0, 0},
+            {1, 0, 0}};
+
+    static constexpr MeshFace kTopFace = {
+            {1, 1, 0,
+             0, 1, 0,
+             0, 1, 1,
+             1, 1, 1},
+            {0, 1, 0}};
+
+    static constexpr MeshFace kBottomFace = {
+            {0, 0, 0,
+             1, 0, 0,
+             1, 0, 1,
+             0, 0, 1},
+            {0, -1, 0}};
+};
+
+struct Mesh {
+    std::vector<float> vertices;
+    std::vector<int> indices;
+};
+
+static void add_face(Mesh &mesh, const MeshFace &face) {
+    std::size_t index = 0;
+    for (std::size_t i = 0; i < 4; ++i) {
+        auto x = face.vertices[index++];
+        auto y = face.vertices[index++];
+        auto z = face.vertices[index++];
+
+        mesh.vertices.push_back(x);
+        mesh.vertices.push_back(y);
+        mesh.vertices.push_back(z);
+        mesh.vertices.push_back(face.normal.x);
+        mesh.vertices.push_back(face.normal.y);
+        mesh.vertices.push_back(face.normal.z);
+    }
+
+    auto index_start = mesh.vertices.size()/6 - 4;
+    mesh.indices.push_back(index_start);
+    mesh.indices.push_back(index_start + 1);
+    mesh.indices.push_back(index_start + 2);
+    mesh.indices.push_back(index_start + 2);
+    mesh.indices.push_back(index_start + 3);
+    mesh.indices.push_back(index_start);
+}
 
 int main()
 {
@@ -68,7 +192,7 @@ int main()
 
     // glfw 创建窗口
     // --------------------
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Hello Rectangle", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Basic Lighting", nullptr, nullptr);
     if (window == nullptr)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -95,86 +219,13 @@ int main()
 //    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     glEnable(GL_DEPTH_TEST);
 
-    // Shader
-    Shader<CreateShaderProgramFromString> shader(g_vs_code, g_fs_code);
-
-    // 创建纹理对象
-    GLuint texture1;
-    glGenTextures(1, &texture1);
-    glBindTexture(GL_TEXTURE_2D, texture1);
-    // 为当前绑定的纹理对象设置环绕、过滤方式
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // 加载生成纹理
-    int width, height, nrChannels;
-    unsigned char *data = stbi_load("container.jpg", &width, &height, &nrChannels, 0);
-    if(data)
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0 /*mipmap*/, GL_RGB, width, height, 0/*legacy*/, GL_RGB, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-        stbi_image_free(data);
-    }
-    else
-    {
-        std::cout << "Failed to load texture" << std::endl;
-    }
-    // 第二个纹理
-    GLuint texture2;
-    glGenTextures(1, &texture2);
-    glBindTexture(GL_TEXTURE_2D, texture2);
-    // 为当前绑定的纹理对象设置环绕、过滤方式
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // 加载生成纹理
-    data = stbi_load("awesomeface.png", &width, &height, &nrChannels, 0);
-    if(data)
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0 /*mipmap*/, GL_RGBA, width, height, 0/*legacy*/, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-        stbi_image_free(data);
-    }
-    else
-    {
-        std::cout << "Failed to load texture" << std::endl;
-    }
-
-    // 顶点数据
-    float vertices[] = {
-            //     ---- 位置 ----
-            0.5f,  0.5f, -0.5f,
-            0.5f, -0.5f, -0.5f,
-            -0.5f, -0.5f, -0.5f,
-            -0.5f,  0.5f, -0.5f,
-
-            0.5f,  0.5f, 0.5f,
-            0.5f, -0.5f, 0.5f,
-            -0.5f, -0.5f, 0.5f,
-            -0.5f,  0.5f, 0.5f,
-    };
-
-    unsigned int indices[] = { // 注意索引从0开始!
-            0, 1, 3, // 第一个三角形
-            1, 2, 3,  // 第二个三角形
-
-            4, 5, 7,
-            5, 6, 7,
-
-            3, 2, 7,
-            2, 6, 7,
-
-            4, 5, 0,
-            5, 1, 0,
-
-            4, 0, 7,
-            0, 3, 7,
-
-            5, 1, 6,
-            1, 2, 6
-    };
+    Mesh box;
+    add_face(box, MeshFaces::kFrontFace);
+    add_face(box, MeshFaces::kBackFace);
+    add_face(box, MeshFaces::kLeftFace);
+    add_face(box, MeshFaces::kRightFace);
+    add_face(box, MeshFaces::kTopFace);
+    add_face(box, MeshFaces::kBottomFace);
 
     // 顶点数组对象, 顶点缓冲对象, 索引缓冲对象
     GLuint VAO, VBO, EBO;
@@ -185,14 +236,18 @@ int main()
     // 绑定
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * box.vertices.size(), box.vertices.data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * box.indices.size(), box.indices.data(), GL_STATIC_DRAW);
     constexpr GLuint posLocation = 0;
     constexpr GLint posFloatCount = 3;
-    constexpr GLint vertexFloatCount = posFloatCount;
+    constexpr GLuint normalLocation = 1;
+    constexpr GLint normalFloatCount = 3;
+    constexpr GLint vertexFloatCount = posFloatCount + normalFloatCount;
     glVertexAttribPointer(posLocation, posFloatCount, GL_FLOAT, GL_FALSE,  vertexFloatCount * sizeof(float), nullptr);
     glEnableVertexAttribArray(posLocation);
+    glVertexAttribPointer(normalLocation, normalFloatCount, GL_FLOAT, GL_FALSE,  vertexFloatCount * sizeof(float), (void*)(posFloatCount*sizeof(float)));
+    glEnableVertexAttribArray(normalLocation);
 
     // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -204,12 +259,15 @@ int main()
     // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
     glBindVertexArray(0);
 
-    shader.Use(); // 不要忘记在设置uniform变量之前激活着色器程序！
-    shader.LoadUniform("lightColor", glm::vec3(1.0f, 1.f, 1.f)); // 或者使用着色器类设置
+    // Shader
+    Shader<CreateShaderProgramFromString> shader(g_vs_code, g_fs_code);
+    Shader<CreateShaderProgramFromString> shader_light(g_vs_code, g_fs_code_light);
 
     glm::vec3 cubePositions[] = {
             glm::vec3( 0.0f,  0.0f,  0.0f),
     };
+
+    glm::vec3 lightPos(3.f, 0.f, 0.f);
 
     // 主循环
     // -----------
@@ -226,34 +284,35 @@ int main()
         // 渲染
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // 绑定纹理
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture1);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, texture2);
         // 当我们渲染一个物体时要使用着色器程序
         shader.Use();
+        shader.LoadUniform("lightPos", lightPos);
+        shader.LoadUniform("lightColor", glm::vec3(1.0f, 1.f, 1.f)); // 或者使用着色器类设置
+        shader.LoadUniform("viewPos", camera.pos());
         // 当只有单个VAO时，不用每帧都绑定
         glBindVertexArray(VAO);
         // Transform
-        glm::mat4 proj = camera.Perspective(static_cast<float>(width/height));
+        glm::mat4 proj = camera.Perspective(static_cast<float>(SCR_WIDTH/SCR_HEIGHT));
         shader.LoadUniform("proj", proj);
         glm::mat4 view = camera.View();
         shader.LoadUniform("view", view);
         shader.LoadUniform("objectColor", glm::vec3(1.0f, 0.5f, 0.31f)); // 或者使用着色器类设置
-        for(std::size_t i = 0; i < 10; ++i)
+        for(std::size_t i = 0; i < 1; ++i)
         {
             glm::mat4 model = glm::translate(glm::mat4(1.f), cubePositions[i]);
             model = glm::rotate(model, (float)glfwGetTime() * glm::radians(45.f), glm::vec3(0.5f, 1.f, 0.f));
             shader.LoadUniform("model", model);
             // 绘制物体
-            glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
+            glCheck(glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr));
         }
 
         // draw light
-        shader.LoadUniform("objectColor", glm::vec3(1.0f, 1.f, 1.f)); // 或者使用着色器类设置
-        glm::mat4 model = glm::translate(glm::mat4(1.f), glm::vec3(3.f, 0.f, 0.f));
-        shader.LoadUniform("model", model);
+        shader_light.Use();
+        shader_light.LoadUniform("proj", proj);
+        shader_light.LoadUniform("view", view);
+        glm::mat4 model = glm::translate(glm::mat4(1.f), lightPos);
+        shader_light.LoadUniform("model", model);
+        shader_light.LoadUniform("lightColor", glm::vec3(1.0f, 1.f, 1.f)); // 或者使用着色器类设置
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
 
         // glfw: 交换双缓冲

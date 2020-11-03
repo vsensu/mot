@@ -88,6 +88,7 @@ public:
             fov_ = 45.0f;
     }
 
+    const glm::vec3 & pos() const {return pos_;}
 
 private:
     glm::vec3 pos_{glm::vec3(0.f, 0.f, 3.f)};
