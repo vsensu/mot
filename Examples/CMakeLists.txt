@@ -2,14 +2,7 @@
 # .h
 include_directories(
         ${PROJECT_SOURCE_DIR}/deps/glad/include
-        ${PROJECT_SOURCE_DIR}/deps/glfw-3.3.2/include
         ${PROJECT_SOURCE_DIR}/deps/stb_image
-        ${PROJECT_SOURCE_DIR}/deps/glm-0.9.9.8
-)
-
-# lib folder
-link_directories(
-        ${PROJECT_BINARY_DIR}/deps/glfw-3.3.2/src
 )
 
 # executable
@@ -39,49 +32,49 @@ add_executable(Colors WIN32 Lighting/Colors/Colors.cpp GetStarted/Shaders/Shader
 
 ## lib
 target_link_libraries(HelloWindow
-        glfw3
+        ${CONAN_LIBS}
         )
 target_link_libraries(HelloTriangle
-        glfw3
+        ${CONAN_LIBS}
         )
 target_link_libraries(HelloRectangle
-        glfw3
+        ${CONAN_LIBS}
         )
 target_link_libraries(ShaderInOut
-        glfw3
+        ${CONAN_LIBS}
         )
 target_link_libraries(ShaderUniform
-        glfw3
+        ${CONAN_LIBS}
         )
 target_link_libraries(ShaderMoreAttributes
-        glfw3
+        ${CONAN_LIBS}
         )
 target_link_libraries(ShaderFile
-        glfw3
+        ${CONAN_LIBS}
         )
 target_link_libraries(HelloTexture
-        glfw3
+        ${CONAN_LIBS}
         )
 target_link_libraries(TexturesCombined
-        glfw3
+        ${CONAN_LIBS}
         )
 target_link_libraries(HelloTransform
-        glfw3
+        ${CONAN_LIBS}
         )
 target_link_libraries(Hello3D
-        glfw3
+        ${CONAN_LIBS}
         )
 target_link_libraries(Cube
-        glfw3
+        ${CONAN_LIBS}
         )
 target_link_libraries(HelloCamera
-        glfw3
+        ${CONAN_LIBS}
         )
 target_link_libraries(GodCamera
-        glfw3
+        ${CONAN_LIBS}
         )
 target_link_libraries(Colors
-        glfw3
+        ${CONAN_LIBS}
         )
 
 set(GUI_ONLY_BINARIES HelloWindow HelloTriangle HelloRectangle ShaderInOut ShaderUniform ShaderMoreAttributes ShaderFile
@@ -95,40 +88,40 @@ endif()
 # post build
 add_custom_command(TARGET ShaderFile
         POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Shaders/vs.glsl ${CMAKE_CURRENT_BINARY_DIR}/vs.glsl
-        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Shaders/fs.glsl ${CMAKE_CURRENT_BINARY_DIR}/fs.glsl
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Shaders/vs.glsl ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/vs.glsl
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Shaders/fs.glsl ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/fs.glsl
         )
 add_custom_command(TARGET HelloTexture
         POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/container.jpg ${CMAKE_CURRENT_BINARY_DIR}/container.jpg
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/container.jpg ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/container.jpg
         )
 add_custom_command(TARGET TexturesCombined
         POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/container.jpg ${CMAKE_CURRENT_BINARY_DIR}/container.jpg
-        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/awesomeface.png ${CMAKE_CURRENT_BINARY_DIR}/awesomeface.png
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/container.jpg ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/container.jpg
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/awesomeface.png ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/awesomeface.png
         )
 add_custom_command(TARGET HelloTransform
         POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/container.jpg ${CMAKE_CURRENT_BINARY_DIR}/container.jpg
-        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/awesomeface.png ${CMAKE_CURRENT_BINARY_DIR}/awesomeface.png
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/container.jpg ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/container.jpg
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/awesomeface.png ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/awesomeface.png
         )
 add_custom_command(TARGET Hello3D
         POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/container.jpg ${CMAKE_CURRENT_BINARY_DIR}/container.jpg
-        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/awesomeface.png ${CMAKE_CURRENT_BINARY_DIR}/awesomeface.png
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/container.jpg ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/container.jpg
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/awesomeface.png ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/awesomeface.png
         )
 add_custom_command(TARGET Cube
         POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/container.jpg ${CMAKE_CURRENT_BINARY_DIR}/container.jpg
-        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/awesomeface.png ${CMAKE_CURRENT_BINARY_DIR}/awesomeface.png
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/container.jpg ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/container.jpg
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/awesomeface.png ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/awesomeface.png
         )
 add_custom_command(TARGET HelloCamera
         POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/container.jpg ${CMAKE_CURRENT_BINARY_DIR}/container.jpg
-        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/awesomeface.png ${CMAKE_CURRENT_BINARY_DIR}/awesomeface.png
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/container.jpg ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/container.jpg
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/awesomeface.png ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/awesomeface.png
         )
 add_custom_command(TARGET GodCamera
         POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/container.jpg ${CMAKE_CURRENT_BINARY_DIR}/container.jpg
-        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/awesomeface.png ${CMAKE_CURRENT_BINARY_DIR}/awesomeface.png
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/container.jpg ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/container.jpg
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/awesomeface.png ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/awesomeface.png
         )

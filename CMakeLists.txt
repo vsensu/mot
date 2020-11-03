@@ -3,19 +3,14 @@ project(mot)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_subdirectory(deps/glfw-3.3.2)
+include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+conan_basic_setup()
+
 add_subdirectory(Examples)
 
 # .h
 include_directories(
         src
-        deps/glad/include
-        deps/glfw-3.3.2/include
-)
-
-# lib folder
-link_directories(
-        ${CMAKE_CURRENT_BINARY_DIR}/deps/glfw-3.3.2/src
 )
 
 # 将当前目录的所有源文件添加进变量

@@ -1,5 +1,11 @@
+## First time
+setup.bat
+
+## Make
+make_debug.bat
+
 ## Build
-Use CMakeLists tool like Clion.
+build_debug.bat
 
 ## Legacy examples
 ### Configurate GLUT and GLEW
