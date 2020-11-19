@@ -31,6 +31,8 @@ add_executable(Colors WIN32 Lighting/Colors/Colors.cpp GetStarted/Shaders/Shader
         ${PROJECT_SOURCE_DIR}/deps/glad/src/glad.c ${PROJECT_SOURCE_DIR}/deps/stb_image/stb_image.cpp)
 add_executable(BasicLighting WIN32 Lighting/Colors/BasicLighting.cpp Lighting/Colors/gl_errors.h Lighting/Colors/gl_errors.cpp GetStarted/Shaders/Shader.h GetStarted/Camera/Camera.h
         ${PROJECT_SOURCE_DIR}/deps/glad/src/glad.c ${PROJECT_SOURCE_DIR}/deps/stb_image/stb_image.cpp)
+add_executable(Materials WIN32 Lighting/Colors/Materials.cpp Lighting/Colors/gl_errors.h Lighting/Colors/gl_errors.cpp GetStarted/Shaders/Shader.h GetStarted/Camera/Camera.h
+        ${PROJECT_SOURCE_DIR}/deps/glad/src/glad.c ${PROJECT_SOURCE_DIR}/deps/stb_image/stb_image.cpp)
 
 ## lib
 target_link_libraries(HelloWindow
@@ -81,9 +83,12 @@ target_link_libraries(Colors
 target_link_libraries(BasicLighting
         ${CONAN_LIBS}
         )
+target_link_libraries(Materials
+        ${CONAN_LIBS}
+        )
 
 set(GUI_ONLY_BINARIES HelloWindow HelloTriangle HelloRectangle ShaderInOut ShaderUniform ShaderMoreAttributes ShaderFile
-        HelloTexture TexturesCombined HelloTransform Hello3D Cube HelloCamera GodCamera Colors BasicLighting)
+        HelloTexture TexturesCombined HelloTransform Hello3D Cube HelloCamera GodCamera Colors BasicLighting Materials)
 if (MSVC)
     # Tell MSVC to use main instead of WinMain for Windows subsystem executables
     set_target_properties(${GUI_ONLY_BINARIES} PROPERTIES
