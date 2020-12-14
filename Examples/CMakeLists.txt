@@ -33,6 +33,8 @@ add_executable(BasicLighting WIN32 Lighting/Colors/BasicLighting.cpp Lighting/Co
         ${PROJECT_SOURCE_DIR}/deps/glad/src/glad.c ${PROJECT_SOURCE_DIR}/deps/stb_image/stb_image.cpp)
 add_executable(Materials WIN32 Lighting/Colors/Materials.cpp Lighting/Colors/gl_errors.h Lighting/Colors/gl_errors.cpp GetStarted/Shaders/Shader.h GetStarted/Camera/Camera.h
         ${PROJECT_SOURCE_DIR}/deps/glad/src/glad.c ${PROJECT_SOURCE_DIR}/deps/stb_image/stb_image.cpp)
+add_executable(LightingMaps WIN32 Lighting/Colors/LightingMaps.cpp Lighting/Colors/gl_errors.h Lighting/Colors/gl_errors.cpp GetStarted/Shaders/Shader.h GetStarted/Camera/Camera.h
+        ${PROJECT_SOURCE_DIR}/deps/glad/src/glad.c ${PROJECT_SOURCE_DIR}/deps/stb_image/stb_image.cpp)
 
 ## lib
 target_link_libraries(HelloWindow
@@ -86,9 +88,12 @@ target_link_libraries(BasicLighting
 target_link_libraries(Materials
         ${CONAN_LIBS}
         )
+target_link_libraries(LightingMaps
+        ${CONAN_LIBS}
+        )
 
 set(GUI_ONLY_BINARIES HelloWindow HelloTriangle HelloRectangle ShaderInOut ShaderUniform ShaderMoreAttributes ShaderFile
-        HelloTexture TexturesCombined HelloTransform Hello3D Cube HelloCamera GodCamera Colors BasicLighting Materials)
+        HelloTexture TexturesCombined HelloTransform Hello3D Cube HelloCamera GodCamera Colors BasicLighting Materials LightingMaps)
 if (MSVC)
     # Tell MSVC to use main instead of WinMain for Windows subsystem executables
     set_target_properties(${GUI_ONLY_BINARIES} PROPERTIES
@@ -134,4 +139,8 @@ add_custom_command(TARGET GodCamera
         POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/container.jpg ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/container.jpg
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/GetStarted/Textures/awesomeface.png ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/awesomeface.png
+        )
+add_custom_command(TARGET LightingMaps
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/Lighting/Colors/container2.png ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/container2.png
         )
