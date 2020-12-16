@@ -10,8 +10,8 @@
 #include <array>
 #include <vector>
 
-#include "../../GetStarted/Shaders/Shader.h"
-#include "../../GetStarted/Camera/Camera.h"
+#include "Shader.h"
+#include "Camera.h"
 #define DEBUG_GL_ERRORS
 #include "gl_errors.h"
 

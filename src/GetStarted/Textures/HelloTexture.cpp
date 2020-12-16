@@ -1,8 +1,9 @@
-#include <iostream>
-#include <string>
-
+#include <stb_image.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+
+#include <iostream>
+#include <string>
 
 #include "Shader.h"
 
@@ -12,6 +13,38 @@ void processInput(GLFWwindow *window);
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
+
+const std::string g_vs_code = R"(
+#version 330 core
+layout (location = 0) in vec3 aPos;
+layout (location = 1) in vec3 aColor;
+layout (location = 2) in vec2 aTexCoord;
+
+out vec3 ourColor;
+out vec2 TexCoord;
+
+void main()
+{
+    gl_Position = vec4(aPos, 1.0);
+    ourColor = aColor;
+    TexCoord = aTexCoord;
+}
+)";
+
+const std::string g_fs_code = R"(
+#version 330 core
+out vec4 FragColor;
+
+in vec3 ourColor;
+in vec2 TexCoord;
+
+uniform sampler2D ourTexture;
+
+void main()
+{
+    FragColor = texture(ourTexture, TexCoord) * vec4(ourColor, 1.0);
+}
+)";
 
 int main()
 {
@@ -50,17 +83,41 @@ int main()
     // clear时填充色
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     // 线框模式
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+//    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-    // Shaders
-    Shader<CreateShaderProgramFromFile> shader("vs.glsl", "fs.glsl");
+    // Shader
+    Shader<CreateShaderProgramFromString> shader(g_vs_code, g_fs_code);
+
+    // 创建纹理对象
+    GLuint texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    // 为当前绑定的纹理对象设置环绕、过滤方式
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // 加载生成纹理
+    int width, height, nrChannels;
+    unsigned char *data = stbi_load("container.jpg", &width, &height, &nrChannels, 0);
+    if(data)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0 /*mipmap*/, GL_RGB, width, height, 0/*legacy*/, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+        stbi_image_free(data);
+    }
+    else
+    {
+        std::cout << "Failed to load texture" << std::endl;
+    }
 
     // 顶点数据
     float vertices[] = {
-            0.5f, 0.5f, 0.0f,   // 右上角
-            0.5f, -0.5f, 0.0f,  // 右下角
-            -0.5f, -0.5f, 0.0f, // 左下角
-            -0.5f, 0.5f, 0.0f   // 左上角
+        //     ---- 位置 ----       ---- 颜色 ----     - 纹理坐标 -
+            0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // 右上
+            0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // 右下
+            -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // 左下
+            -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // 左上
     };
 
     unsigned int indices[] = { // 注意索引从0开始!
@@ -82,11 +139,17 @@ int main()
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
     constexpr GLuint posLocation = 0;
     constexpr GLint posFloatCount = 3;
-    constexpr GLint vertexFloatCount = posFloatCount;
-    // 定义OpenGL如何理解该顶点数据
+    constexpr GLint colorFloatCount = 3;
+    constexpr GLint coordFloatCount = 2;
+    constexpr GLint vertexFloatCount = posFloatCount + colorFloatCount + coordFloatCount;
     glVertexAttribPointer(posLocation, posFloatCount, GL_FLOAT, GL_FALSE,  vertexFloatCount * sizeof(float), nullptr);
-    // 启用顶点属性 顶点属性默认是禁用的
     glEnableVertexAttribArray(posLocation);
+    constexpr GLuint colorLocation = 1;
+    glVertexAttribPointer(colorLocation, colorFloatCount, GL_FLOAT, GL_FALSE, vertexFloatCount * sizeof(float), (void*)(posFloatCount*sizeof(float)));
+    glEnableVertexAttribArray(colorLocation);
+    constexpr GLuint coordLocation = 2;
+    glVertexAttribPointer(coordLocation, coordFloatCount, GL_FLOAT, GL_FALSE, vertexFloatCount * sizeof(float), (void*)((posFloatCount+colorFloatCount)*sizeof(float)));
+    glEnableVertexAttribArray(coordLocation);
 
     // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -111,11 +174,8 @@ int main()
 
         // 当我们渲染一个物体时要使用着色器程序
         shader.Use();
-
-        float timeValue = glfwGetTime();
-        float greenValue = (sin(timeValue)/2) + 0.5f;
-        shader.SetUniform("ourColor", 0.f, greenValue, 0.f, 1.f);
-
+        // 绑定纹理
+        glBindTexture(GL_TEXTURE_2D, texture);
         // 当只有单个VAO时，不用每帧都绑定
         glBindVertexArray(VAO);
         // 绘制物体

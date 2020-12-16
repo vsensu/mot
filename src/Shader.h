@@ -155,6 +155,11 @@ struct Shader
         glCheck(glUniform3iv(glUniform3fv(GetUniformLocation(name), 1, glm::value_ptr(vector))));
     }
 
+        void LoadUniform(const std::string &name, const glm::vec4& vector)
+    {
+        glCheck(glUniform3fv(GetUniformLocation(name), 1, glm::value_ptr(vector)));
+    }
+
     void LoadUniform(const std::string &name, const glm::mat4& matrix)
     {
         glCheck(glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, glm::value_ptr(matrix)));

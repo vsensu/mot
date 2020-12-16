@@ -1,11 +1,14 @@
 #include <stb_image.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include <iostream>
 #include <string>
 
-#include "../Shaders/Shader.h"
+#include "Shader.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
@@ -23,11 +26,13 @@ layout (location = 2) in vec2 aTexCoord;
 out vec3 ourColor;
 out vec2 TexCoord;
 
+uniform mat4 transform;
+
 void main()
 {
-    gl_Position = vec4(aPos, 1.0);
+    gl_Position = transform * vec4(aPos, 1.0);
     ourColor = aColor;
-    TexCoord = aTexCoord;
+    TexCoord = vec2(aTexCoord.x, 1-aTexCoord.y);
 }
 )";
 
@@ -187,7 +192,7 @@ int main()
     // 将texture1名称 关联到 GL_TEXTURE0 纹理单元
     glUniform1i(glGetUniformLocation(shader.shaderProgram, "texture1"), 0); // 手动设置
     // 将texture2名称 关联到 GL_TEXTURE1 纹理单元
-    shader.SetUniform("texture2", 1); // 或者使用着色器类设置
+    shader.LoadUniform("texture2", 1); // 或者使用着色器类设置
 
     // 主循环
     // -----------
@@ -207,6 +212,13 @@ int main()
         glBindTexture(GL_TEXTURE_2D, texture2);
         // 当我们渲染一个物体时要使用着色器程序
         shader.Use();
+        // Transform
+        glm::mat4 trans(1.0f);
+        trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
+        trans = glm::rotate(trans, static_cast<float>(glfwGetTime()), glm::vec3(0.f, 0.f, 1.f));
+        trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 0.5f));
+        shader.LoadUniform("transform", trans);
+
         // 当只有单个VAO时，不用每帧都绑定
         glBindVertexArray(VAO);
         // 绘制物体

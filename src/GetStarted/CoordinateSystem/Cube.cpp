@@ -8,7 +8,7 @@
 #include <iostream>
 #include <string>
 
-#include "../Shaders/Shader.h"
+#include "Shader.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
@@ -26,11 +26,13 @@ layout (location = 2) in vec2 aTexCoord;
 out vec3 ourColor;
 out vec2 TexCoord;
 
-uniform mat4 transform;
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 proj;
 
 void main()
 {
-    gl_Position = transform * vec4(aPos, 1.0);
+    gl_Position = proj * view * model * vec4(aPos, 1.0);
     ourColor = aColor;
     TexCoord = vec2(aTexCoord.x, 1-aTexCoord.y);
 }
@@ -90,6 +92,7 @@ int main()
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     // 线框模式
 //    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glEnable(GL_DEPTH_TEST);
 
     // Shader
     Shader<CreateShaderProgramFromString> shader(g_vs_code, g_fs_code);
@@ -141,15 +144,35 @@ int main()
     // 顶点数据
     float vertices[] = {
             //     ---- 位置 ----       ---- 颜色 ----     - 纹理坐标 -
-            0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // 右上
-            0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // 右下
-            -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // 左下
-            -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // 左上
+            0.5f,  0.5f, -0.5f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // 右上
+            0.5f, -0.5f, -0.5f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // 右下
+            -0.5f, -0.5f, -0.5f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // 左下
+            -0.5f,  0.5f, -0.5f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f,    // 左上
+
+            0.5f,  0.5f, 0.5f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // 右上
+            0.5f, -0.5f, 0.5f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // 右下
+            -0.5f, -0.5f, 0.5f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // 左下
+            -0.5f,  0.5f, 0.5f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // 左上
     };
 
     unsigned int indices[] = { // 注意索引从0开始!
             0, 1, 3, // 第一个三角形
-            1, 2, 3  // 第二个三角形
+            1, 2, 3,  // 第二个三角形
+
+            4, 5, 7,
+            5, 6, 7,
+
+            3, 2, 7,
+            2, 6, 7,
+
+            4, 5, 0,
+            5, 1, 0,
+
+            4, 0, 7,
+            0, 3, 7,
+
+            5, 1, 6,
+            1, 2, 6
     };
 
     // 顶点数组对象, 顶点缓冲对象, 索引缓冲对象
@@ -192,7 +215,25 @@ int main()
     // 将texture1名称 关联到 GL_TEXTURE0 纹理单元
     glUniform1i(glGetUniformLocation(shader.shaderProgram, "texture1"), 0); // 手动设置
     // 将texture2名称 关联到 GL_TEXTURE1 纹理单元
-    shader.SetUniform("texture2", 1); // 或者使用着色器类设置
+    shader.LoadUniform("texture2", 1); // 或者使用着色器类设置
+    // Transform
+    glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.f, 0.f, -3.f));
+    shader.LoadUniform("view", view);
+    glm::mat4 proj = glm::perspective(glm::radians(45.f), static_cast<float>(width/height), 0.1f, 100.0f);
+    shader.LoadUniform("proj", proj);
+
+    glm::vec3 cubePositions[] = {
+            glm::vec3( 0.0f,  0.0f,  0.0f),
+            glm::vec3( 2.0f,  5.0f, -15.0f),
+            glm::vec3(-1.5f, -2.2f, -2.5f),
+            glm::vec3(-3.8f, -2.0f, -12.3f),
+            glm::vec3( 2.4f, -0.4f, -3.5f),
+            glm::vec3(-1.7f,  3.0f, -7.5f),
+            glm::vec3( 1.3f, -2.0f, -2.5f),
+            glm::vec3( 1.5f,  2.0f, -2.5f),
+            glm::vec3( 1.5f,  0.2f, -1.5f),
+            glm::vec3(-1.3f,  1.0f, -1.5f)
+    };
 
     // 主循环
     // -----------
@@ -203,7 +244,7 @@ int main()
         processInput(window);
 
         // 渲染
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // 绑定纹理
         glActiveTexture(GL_TEXTURE0);
@@ -212,17 +253,16 @@ int main()
         glBindTexture(GL_TEXTURE_2D, texture2);
         // 当我们渲染一个物体时要使用着色器程序
         shader.Use();
-        // Transform
-        glm::mat4 trans(1.0f);
-        trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
-        trans = glm::rotate(trans, static_cast<float>(glfwGetTime()), glm::vec3(0.f, 0.f, 1.f));
-        trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 0.5f));
-        shader.SetUniform("transform", glm::value_ptr(trans));
-
         // 当只有单个VAO时，不用每帧都绑定
         glBindVertexArray(VAO);
-        // 绘制物体
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+        for(std::size_t i = 0; i < 10; ++i)
+        {
+            glm::mat4 model = glm::translate(glm::mat4(1.f), cubePositions[i]);
+            model = glm::rotate(model, (float)glfwGetTime() * glm::radians(45.f), glm::vec3(0.5f, 1.f, 0.f));
+            shader.LoadUniform("model", model);
+            // 绘制物体
+            glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
+        }
 
         // glfw: 交换双缓冲
         // -------------------------------------------------------------------------------

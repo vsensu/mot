@@ -8,7 +8,7 @@
 #include <iostream>
 #include <string>
 
-#include "../Shaders/Shader.h"
+#include "Shader.h"
 #include "Camera.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -226,7 +226,7 @@ int main()
     // 将texture1名称 关联到 GL_TEXTURE0 纹理单元
     glUniform1i(glGetUniformLocation(shader.shaderProgram, "texture1"), 0); // 手动设置
     // 将texture2名称 关联到 GL_TEXTURE1 纹理单元
-    shader.SetUniform("texture2", 1); // 或者使用着色器类设置
+    shader.LoadUniform("texture2", 1); // 或者使用着色器类设置
 
     glm::vec3 cubePositions[] = {
             glm::vec3( 0.0f,  0.0f,  0.0f),
@@ -267,14 +267,14 @@ int main()
         glBindVertexArray(VAO);
         // Transform
         glm::mat4 proj = camera.Perspective(static_cast<float>(width/height));
-        shader.SetUniform("proj", glm::value_ptr(proj));
+        shader.LoadUniform("proj", proj);
         glm::mat4 view = camera.View();
-        shader.SetUniform("view", glm::value_ptr(view));
+        shader.LoadUniform("view", view);
         for(std::size_t i = 0; i < 10; ++i)
         {
             glm::mat4 model = glm::translate(glm::mat4(1.f), cubePositions[i]);
             model = glm::rotate(model, (float)glfwGetTime() * glm::radians(45.f), glm::vec3(0.5f, 1.f, 0.f));
-            shader.SetUniform("model", glm::value_ptr(model));
+            shader.LoadUniform("model", model);
             // 绘制物体
             glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
         }

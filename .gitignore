@@ -127,3 +127,5 @@ fabric.properties
 
 build_debug/
 build_release/
+
+.xmake

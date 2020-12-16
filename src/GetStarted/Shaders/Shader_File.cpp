@@ -1,14 +1,10 @@
-#include <stb_image.h>
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
 #include <iostream>
 #include <string>
 
-#include "../Shaders/Shader.h"
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
+#include "Shader.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
@@ -16,43 +12,6 @@ void processInput(GLFWwindow *window);
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
-
-const std::string g_vs_code = R"(
-#version 330 core
-layout (location = 0) in vec3 aPos;
-layout (location = 1) in vec3 aColor;
-layout (location = 2) in vec2 aTexCoord;
-
-out vec3 ourColor;
-out vec2 TexCoord;
-
-uniform mat4 model;
-uniform mat4 view;
-uniform mat4 proj;
-
-void main()
-{
-    gl_Position = proj * view * model * vec4(aPos, 1.0);
-    ourColor = aColor;
-    TexCoord = vec2(aTexCoord.x, 1-aTexCoord.y);
-}
-)";
-
-const std::string g_fs_code = R"(
-#version 330 core
-out vec4 FragColor;
-
-in vec3 ourColor;
-in vec2 TexCoord;
-
-uniform sampler2D texture1;
-uniform sampler2D texture2;
-
-void main()
-{
-    FragColor = mix(texture(texture1, TexCoord), texture(texture2, TexCoord), 0.2) * vec4(ourColor, 1.0);
-}
-)";
 
 int main()
 {
@@ -91,62 +50,17 @@ int main()
     // clear时填充色
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     // 线框模式
-//    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-    // Shader
-    Shader<CreateShaderProgramFromString> shader(g_vs_code, g_fs_code);
-
-    // 创建纹理对象
-    GLuint texture1;
-    glGenTextures(1, &texture1);
-    glBindTexture(GL_TEXTURE_2D, texture1);
-    // 为当前绑定的纹理对象设置环绕、过滤方式
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // 加载生成纹理
-    int width, height, nrChannels;
-    unsigned char *data = stbi_load("container.jpg", &width, &height, &nrChannels, 0);
-    if(data)
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0 /*mipmap*/, GL_RGB, width, height, 0/*legacy*/, GL_RGB, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-        stbi_image_free(data);
-    }
-    else
-    {
-        std::cout << "Failed to load texture" << std::endl;
-    }
-    // 第二个纹理
-    GLuint texture2;
-    glGenTextures(1, &texture2);
-    glBindTexture(GL_TEXTURE_2D, texture2);
-    // 为当前绑定的纹理对象设置环绕、过滤方式
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // 加载生成纹理
-    data = stbi_load("awesomeface.png", &width, &height, &nrChannels, 0);
-    if(data)
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0 /*mipmap*/, GL_RGBA, width, height, 0/*legacy*/, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-        stbi_image_free(data);
-    }
-    else
-    {
-        std::cout << "Failed to load texture" << std::endl;
-    }
+    // Shaders
+    Shader<CreateShaderProgramFromFile> shader("vs.glsl", "fs.glsl");
 
     // 顶点数据
     float vertices[] = {
-            //     ---- 位置 ----       ---- 颜色 ----     - 纹理坐标 -
-            0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // 右上
-            0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // 右下
-            -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // 左下
-            -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // 左上
+            0.5f, 0.5f, 0.0f,   // 右上角
+            0.5f, -0.5f, 0.0f,  // 右下角
+            -0.5f, -0.5f, 0.0f, // 左下角
+            -0.5f, 0.5f, 0.0f   // 左上角
     };
 
     unsigned int indices[] = { // 注意索引从0开始!
@@ -168,17 +82,11 @@ int main()
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
     constexpr GLuint posLocation = 0;
     constexpr GLint posFloatCount = 3;
-    constexpr GLint colorFloatCount = 3;
-    constexpr GLint coordFloatCount = 2;
-    constexpr GLint vertexFloatCount = posFloatCount + colorFloatCount + coordFloatCount;
+    constexpr GLint vertexFloatCount = posFloatCount;
+    // 定义OpenGL如何理解该顶点数据
     glVertexAttribPointer(posLocation, posFloatCount, GL_FLOAT, GL_FALSE,  vertexFloatCount * sizeof(float), nullptr);
+    // 启用顶点属性 顶点属性默认是禁用的
     glEnableVertexAttribArray(posLocation);
-    constexpr GLuint colorLocation = 1;
-    glVertexAttribPointer(colorLocation, colorFloatCount, GL_FLOAT, GL_FALSE, vertexFloatCount * sizeof(float), (void*)(posFloatCount*sizeof(float)));
-    glEnableVertexAttribArray(colorLocation);
-    constexpr GLuint coordLocation = 2;
-    glVertexAttribPointer(coordLocation, coordFloatCount, GL_FLOAT, GL_FALSE, vertexFloatCount * sizeof(float), (void*)((posFloatCount+colorFloatCount)*sizeof(float)));
-    glEnableVertexAttribArray(coordLocation);
 
     // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -189,19 +97,6 @@ int main()
     // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
     // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
     glBindVertexArray(0);
-
-    shader.Use(); // 不要忘记在设置uniform变量之前激活着色器程序！
-    // 将texture1名称 关联到 GL_TEXTURE0 纹理单元
-    glUniform1i(glGetUniformLocation(shader.shaderProgram, "texture1"), 0); // 手动设置
-    // 将texture2名称 关联到 GL_TEXTURE1 纹理单元
-    shader.SetUniform("texture2", 1); // 或者使用着色器类设置
-    // Transform
-    glm::mat4 model = glm::rotate(glm::mat4(1.0f), glm::radians(-55.f), glm::vec3(1.f, 0.f, 0.f));
-    shader.SetUniform("model", glm::value_ptr(model));
-    glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.f, 0.f, -3.f));
-    shader.SetUniform("view", glm::value_ptr(view));
-    glm::mat4 proj = glm::perspective(glm::radians(45.f), static_cast<float>(width/height), 0.1f, 100.0f);
-    shader.SetUniform("proj", glm::value_ptr(proj));
 
     // 主循环
     // -----------
@@ -214,13 +109,13 @@ int main()
         // 渲染
         glClear(GL_COLOR_BUFFER_BIT);
 
-        // 绑定纹理
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture1);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, texture2);
         // 当我们渲染一个物体时要使用着色器程序
         shader.Use();
+
+        float timeValue = glfwGetTime();
+        float greenValue = (sin(timeValue)/2) + 0.5f;
+        shader.LoadUniform("ourColor", glm::vec4(0.f, greenValue, 0.f, 1.f));
+
         // 当只有单个VAO时，不用每帧都绑定
         glBindVertexArray(VAO);
         // 绘制物体

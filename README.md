@@ -1,20 +1,19 @@
-## First time
-setup.bat
-
-## Make
-make_debug.bat
+## Platform
+xmake f -p [windows|linux|macosx|android|iphoneos ..] -a [x86|arm64 ..] -m [debug|release]
+> eg. xmake f -p windows -a x86 -m debug
 
 ## Build
-build_debug.bat
+xmake
 
-## Legacy examples
-### Configurate GLUT and GLEW
+## vscode compile_commands.json
+xmake project -k compile_commands
+C/C++: Edit Configurations (JSON) 
 
-GLUT: OpenGL Utility Tookit(window, event, io etc). Freeglut is an open source implementation.
-
-build from source. https://github.com/dcnieho/FreeGLUT/releases
-
-GLEW: gl,glu,glext,wgl,glx. https://github.com/nigels-com/glew/releases
+"configurations": [
+    {
+      "compileCommands": "${workspaceFolder}/.vscode/compile_commands.json"
+    }
+  ],
 
 ## Reference
 https://learnopengl.com/
