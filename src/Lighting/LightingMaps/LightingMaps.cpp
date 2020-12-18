@@ -72,7 +72,7 @@ struct Material
 {
     // vec3 ambient; 移除了环境光的存储，因为环境光颜色在几乎所有情况下都等于漫反射颜色
     sampler2D diffuse;
-    vec3 specular;
+    sampler2D specular;
     float shininess;    // 影响镜面高光的散射/半径
 };
 uniform Material material;
@@ -94,7 +94,7 @@ void main()
     vec3 viewDir = normalize(viewPos - FragPos);
     vec3 reflectDir = reflect(-lightDir, n);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-    vec3 specular = light.specular * (spec * material.specular);
+    vec3 specular = light.specular * spec * vec3(texture(material.specular, TexCoords));
 
     vec3 result = ambient + diffuse + specular;
     FragColor = vec4(result, 1.0);
@@ -283,7 +283,7 @@ int main()
 //    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     glEnable(GL_DEPTH_TEST);
 
-        // 创建纹理对象
+    // 创建纹理对象
     GLuint diffuseMap;
     glGenTextures(1, &diffuseMap);
     glBindTexture(GL_TEXTURE_2D, diffuseMap);
@@ -295,6 +295,28 @@ int main()
     // 加载生成纹理
     int width, height, nrChannels;
     unsigned char *data = stbi_load("container2.png", &width, &height, &nrChannels, 0);
+    if(data)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0 /*mipmap*/, GL_RGBA, width, height, 0/*legacy*/, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+        stbi_image_free(data);
+    }
+    else
+    {
+        std::cout << "Failed to load texture" << std::endl;
+    }
+
+    // 创建纹理对象
+    GLuint specularMap;
+    glGenTextures(1, &specularMap);
+    glBindTexture(GL_TEXTURE_2D, specularMap);
+    // 为当前绑定的纹理对象设置环绕、过滤方式
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // 加载生成纹理
+    data = stbi_load("container2_specular.png", &width, &height, &nrChannels, 0);
     if(data)
     {
         glTexImage2D(GL_TEXTURE_2D, 0 /*mipmap*/, GL_RGBA, width, height, 0/*legacy*/, GL_RGBA, GL_UNSIGNED_BYTE, data);
@@ -389,9 +411,15 @@ int main()
         shader.LoadUniform("proj", proj);
         glm::mat4 view = camera.View();
         shader.LoadUniform("view", view);
+
         shader.LoadUniform("material.diffuse", 0);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, diffuseMap);
+
+        shader.LoadUniform("material.specular", 1);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, specularMap);
+
         shader.LoadUniform("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
         shader.LoadUniform("material.shininess", 64.f);
         for(std::size_t i = 0; i < 1; ++i)

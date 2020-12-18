@@ -265,4 +265,5 @@ target("LightingMaps")
     end
     after_build(function (target)
         os.cp("res/img/container2.png", path.join(target:targetdir(), "container2.png"))
+        os.cp("res/img/container2_specular.png", path.join(target:targetdir(), "container2_specular.png"))
     end)
