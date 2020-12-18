@@ -154,7 +154,9 @@ struct Mesh {
 
 static void add_face(Mesh &mesh, const MeshFace &face) {
     std::size_t index = 0;
-    for (std::size_t i = 0; i < 4; ++i) {
+    constexpr std::size_t vertex_float_count = 6;
+    constexpr std::size_t face_vertex_count = 4;
+    for (int i = 0; i < face_vertex_count; ++i) {
         auto x = face.vertices[index++];
         auto y = face.vertices[index++];
         auto z = face.vertices[index++];
@@ -167,7 +169,7 @@ static void add_face(Mesh &mesh, const MeshFace &face) {
         mesh.vertices.push_back(face.normal.z);
     }
 
-    auto index_start = mesh.vertices.size()/6 - 4;
+    auto index_start = mesh.vertices.size()/vertex_float_count - face_vertex_count;
     mesh.indices.push_back(index_start);
     mesh.indices.push_back(index_start + 1);
     mesh.indices.push_back(index_start + 2);
