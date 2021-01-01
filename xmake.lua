@@ -1,5 +1,5 @@
-add_requires("glfw 3.3.2")
-add_requires("glm 0.9.9+8")
+add_requires("conan::glfw/3.3.2", {alias = "glfw"})
+add_requires("conan::glm/0.9.9.8", {alias = "glm"})
 
 target("HelloWindow")
     set_kind("binary")
@@ -9,6 +9,7 @@ target("HelloWindow")
     add_packages("glfw", "glm")
     if is_plat("windows") then 
         add_ldflags("-subsystem:windows", "-entry:mainCRTStartup", {force = true}) 
+        add_links("user32", "gdi32", "shell32")
     end
 
 target("HelloTriangle")
@@ -19,6 +20,7 @@ target("HelloTriangle")
     add_packages("glfw", "glm")
     if is_plat("windows") then 
         add_ldflags("-subsystem:windows", "-entry:mainCRTStartup", {force = true}) 
+        add_links("user32", "gdi32", "shell32")
     end
 
 target("HelloRectangle")
@@ -29,6 +31,7 @@ target("HelloRectangle")
     add_packages("glfw", "glm")
     if is_plat("windows") then 
         add_ldflags("-subsystem:windows", "-entry:mainCRTStartup", {force = true}) 
+        add_links("user32", "gdi32", "shell32")
     end
 
 
@@ -40,6 +43,7 @@ target("Shader_InOut")
     add_packages("glfw", "glm")
     if is_plat("windows") then 
         add_ldflags("-subsystem:windows", "-entry:mainCRTStartup", {force = true}) 
+        add_links("user32", "gdi32", "shell32")
     end
 
 target("Shader_Uniform")
@@ -50,6 +54,7 @@ target("Shader_Uniform")
     add_packages("glfw", "glm")
     if is_plat("windows") then 
         add_ldflags("-subsystem:windows", "-entry:mainCRTStartup", {force = true}) 
+        add_links("user32", "gdi32", "shell32")
     end
 
 target("Shader_MoreAttributes")
@@ -60,6 +65,7 @@ target("Shader_MoreAttributes")
     add_packages("glfw", "glm")
     if is_plat("windows") then 
         add_ldflags("-subsystem:windows", "-entry:mainCRTStartup", {force = true}) 
+        add_links("user32", "gdi32", "shell32")
     end
 
 target("Shader_File")
@@ -72,6 +78,7 @@ target("Shader_File")
     add_packages("glfw", "glm")
     if is_plat("windows") then 
         add_ldflags("-subsystem:windows", "-entry:mainCRTStartup", {force = true}) 
+        add_links("user32", "gdi32", "shell32")
     end
     after_build(function (target)
         os.cp("src/GetStarted/Shaders/fs.glsl", path.join(target:targetdir(), "fs.glsl"))
@@ -91,6 +98,7 @@ target("HelloTexture")
     add_packages("glfw", "glm")
     if is_plat("windows") then 
         add_ldflags("-subsystem:windows", "-entry:mainCRTStartup", {force = true}) 
+        add_links("user32", "gdi32", "shell32")
     end
     after_build(function (target)
         os.cp("res/img/container.jpg", path.join(target:targetdir(), "container.jpg"))
@@ -108,6 +116,7 @@ target("TexturesCombined")
     add_packages("glfw", "glm")
     if is_plat("windows") then 
         add_ldflags("-subsystem:windows", "-entry:mainCRTStartup", {force = true}) 
+        add_links("user32", "gdi32", "shell32")
     end
     after_build(function (target)
         os.cp("res/img/container.jpg", path.join(target:targetdir(), "container.jpg"))
@@ -127,6 +136,7 @@ target("HelloTransform")
     add_packages("glfw", "glm")
     if is_plat("windows") then 
         add_ldflags("-subsystem:windows", "-entry:mainCRTStartup", {force = true}) 
+        add_links("user32", "gdi32", "shell32")
     end
     after_build(function (target)
         os.cp("res/img/container.jpg", path.join(target:targetdir(), "container.jpg"))
@@ -146,6 +156,7 @@ target("Hello3D")
     add_packages("glfw", "glm")
     if is_plat("windows") then 
         add_ldflags("-subsystem:windows", "-entry:mainCRTStartup", {force = true}) 
+        add_links("user32", "gdi32", "shell32")
     end
     after_build(function (target)
         os.cp("res/img/container.jpg", path.join(target:targetdir(), "container.jpg"))
@@ -164,6 +175,7 @@ target("Cube")
     add_packages("glfw", "glm")
     if is_plat("windows") then 
         add_ldflags("-subsystem:windows", "-entry:mainCRTStartup", {force = true}) 
+        add_links("user32", "gdi32", "shell32")
     end
     after_build(function (target)
         os.cp("res/img/container.jpg", path.join(target:targetdir(), "container.jpg"))
@@ -183,6 +195,7 @@ target("HelloCamera")
     add_packages("glfw", "glm")
     if is_plat("windows") then 
         add_ldflags("-subsystem:windows", "-entry:mainCRTStartup", {force = true}) 
+        add_links("user32", "gdi32", "shell32")
     end
     after_build(function (target)
         os.cp("res/img/container.jpg", path.join(target:targetdir(), "container.jpg"))
@@ -201,6 +214,7 @@ target("GodCamera")
     add_packages("glfw", "glm")
     if is_plat("windows") then 
         add_ldflags("-subsystem:windows", "-entry:mainCRTStartup", {force = true}) 
+        add_links("user32", "gdi32", "shell32")
     end
     after_build(function (target)
         os.cp("res/img/container.jpg", path.join(target:targetdir(), "container.jpg"))
@@ -220,6 +234,7 @@ target("Colors")
     add_packages("glfw", "glm")
     if is_plat("windows") then 
         add_ldflags("-subsystem:windows", "-entry:mainCRTStartup", {force = true}) 
+        add_links("user32", "gdi32", "shell32")
     end
 
 target("BasicLighting")
@@ -234,6 +249,7 @@ target("BasicLighting")
     add_packages("glfw", "glm")
     if is_plat("windows") then 
         add_ldflags("-subsystem:windows", "-entry:mainCRTStartup", {force = true}) 
+        add_links("user32", "gdi32", "shell32")
     end
 
 target("Materials")
@@ -248,6 +264,7 @@ target("Materials")
     add_packages("glfw", "glm")
     if is_plat("windows") then 
         add_ldflags("-subsystem:windows", "-entry:mainCRTStartup", {force = true}) 
+        add_links("user32", "gdi32", "shell32")
     end
 
 target("LightingMaps")
@@ -262,6 +279,7 @@ target("LightingMaps")
     add_packages("glfw", "glm")
     if is_plat("windows") then 
         add_ldflags("-subsystem:windows", "-entry:mainCRTStartup", {force = true}) 
+        add_links("user32", "gdi32", "shell32")
     end
     after_build(function (target)
         os.cp("res/img/container2.png", path.join(target:targetdir(), "container2.png"))
@@ -281,6 +299,7 @@ target("DirectionalLight")
     add_packages("glfw", "glm")
     if is_plat("windows") then 
         add_ldflags("-subsystem:windows", "-entry:mainCRTStartup", {force = true}) 
+        add_links("user32", "gdi32", "shell32")
     end
     after_build(function (target)
         os.cp("res/img/container2.png", path.join(target:targetdir(), "container2.png"))
@@ -299,6 +318,7 @@ target("PointLight")
     add_packages("glfw", "glm")
     if is_plat("windows") then 
         add_ldflags("-subsystem:windows", "-entry:mainCRTStartup", {force = true}) 
+        add_links("user32", "gdi32", "shell32")
     end
     after_build(function (target)
         os.cp("res/img/container2.png", path.join(target:targetdir(), "container2.png"))
@@ -317,6 +337,7 @@ target("FlashLight")
     add_packages("glfw", "glm")
     if is_plat("windows") then 
         add_ldflags("-subsystem:windows", "-entry:mainCRTStartup", {force = true}) 
+        add_links("user32", "gdi32", "shell32")
     end
     after_build(function (target)
         os.cp("res/img/container2.png", path.join(target:targetdir(), "container2.png"))
@@ -335,6 +356,7 @@ target("MultipleLights")
     add_packages("glfw", "glm")
     if is_plat("windows") then 
         add_ldflags("-subsystem:windows", "-entry:mainCRTStartup", {force = true}) 
+        add_links("user32", "gdi32", "shell32")
     end
     after_build(function (target)
         os.cp("res/img/container2.png", path.join(target:targetdir(), "container2.png"))
