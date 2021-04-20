@@ -1,5 +1,5 @@
-add_requires("conan::glfw/3.3.2", {alias = "glfw"})
-add_requires("conan::glm/0.9.9.8", {alias = "glm"})
+add_requires("glfw 3.3.2", {alias = "glfw"})
+add_requires("glm 0.9.9+8", {alias = "glm"})
 
 target("HelloWindow")
     set_kind("binary")
