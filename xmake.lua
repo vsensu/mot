@@ -1,6 +1,8 @@
 add_requires("glfw 3.3.2", {alias = "glfw"})
 add_requires("glm 0.9.9+8", {alias = "glm"})
 
+add_rules("mode.debug", "mode.release")
+
 target("HelloWindow")
     set_kind("binary")
     add_includedirs("$(projectdir)/deps/glad/include")
@@ -81,8 +83,14 @@ target("Shader_File")
         add_links("user32", "gdi32", "shell32")
     end
     after_build(function (target)
-        os.cp("src/GetStarted/Shaders/fs.glsl", path.join(target:targetdir(), "fs.glsl"))
-        os.cp("src/GetStarted/Shaders/vs.glsl", path.join(target:targetdir(), "vs.glsl"))
+        fs = path.join(target:targetdir(), "fs.glsl")
+        if not os.exists(fs) then
+            os.cp("src/GetStarted/Shaders/fs.glsl", fs)
+        end
+        vs = path.join(target:targetdir(), "vs.glsl")
+        if not os.exists(vs) then
+            os.cp("src/GetStarted/Shaders/vs.glsl", vs)
+        end
     end)
 
 
@@ -101,7 +109,10 @@ target("HelloTexture")
         add_links("user32", "gdi32", "shell32")
     end
     after_build(function (target)
-        os.cp("res/img/container.jpg", path.join(target:targetdir(), "container.jpg"))
+        container = path.join(target:targetdir(), "container.jpg")
+        if not os.exists(container) then
+            os.cp("res/img/container.jpg", container)
+        end
     end)
 
 target("TexturesCombined")
@@ -119,8 +130,14 @@ target("TexturesCombined")
         add_links("user32", "gdi32", "shell32")
     end
     after_build(function (target)
-        os.cp("res/img/container.jpg", path.join(target:targetdir(), "container.jpg"))
-        os.cp("res/img/awesomeface.png", path.join(target:targetdir(), "awesomeface.png"))
+        container = path.join(target:targetdir(), "container.jpg")
+        if not os.exists(container) then
+            os.cp("res/img/container.jpg", container)
+        end
+        awesomeface = path.join(target:targetdir(), "awesomeface.png")
+        if not os.exists(awesomeface) then
+            os.cp("res/img/awesomeface.png", awesomeface)
+        end
     end)
 
 
@@ -139,8 +156,14 @@ target("HelloTransform")
         add_links("user32", "gdi32", "shell32")
     end
     after_build(function (target)
-        os.cp("res/img/container.jpg", path.join(target:targetdir(), "container.jpg"))
-        os.cp("res/img/awesomeface.png", path.join(target:targetdir(), "awesomeface.png"))
+        container = path.join(target:targetdir(), "container.jpg")
+        if not os.exists(container) then
+            os.cp("res/img/container.jpg", container)
+        end
+        awesomeface = path.join(target:targetdir(), "awesomeface.png")
+        if not os.exists(awesomeface) then
+            os.cp("res/img/awesomeface.png", awesomeface)
+        end
     end)
     
 
@@ -159,8 +182,14 @@ target("Hello3D")
         add_links("user32", "gdi32", "shell32")
     end
     after_build(function (target)
-        os.cp("res/img/container.jpg", path.join(target:targetdir(), "container.jpg"))
-        os.cp("res/img/awesomeface.png", path.join(target:targetdir(), "awesomeface.png"))
+        container = path.join(target:targetdir(), "container.jpg")
+        if not os.exists(container) then 
+            os.cp("res/img/container.jpg", container)
+        end
+        awesomeface = path.join(target:targetdir(), "awesomeface.png")
+        if not os.exists(awesomeface) then
+            os.cp("res/img/awesomeface.png", awesomeface)
+        end
     end)
 
 target("Cube")
@@ -178,8 +207,14 @@ target("Cube")
         add_links("user32", "gdi32", "shell32")
     end
     after_build(function (target)
-        os.cp("res/img/container.jpg", path.join(target:targetdir(), "container.jpg"))
-        os.cp("res/img/awesomeface.png", path.join(target:targetdir(), "awesomeface.png"))
+        container = path.join(target:targetdir(), "container.jpg")
+        if not os.exists(container) then
+            os.cp("res/img/container.jpg", container)
+        end
+        awesomeface = path.join(target:targetdir(), "awesomeface.png")
+        if not os.exists(awesomeface) then
+            os.cp("res/img/awesomeface.png", awesomeface)
+        end
     end)
 
 
@@ -198,8 +233,14 @@ target("HelloCamera")
         add_links("user32", "gdi32", "shell32")
     end
     after_build(function (target)
-        os.cp("res/img/container.jpg", path.join(target:targetdir(), "container.jpg"))
-        os.cp("res/img/awesomeface.png", path.join(target:targetdir(), "awesomeface.png"))
+        container = path.join(target:targetdir(), "container.jpg")
+        if not os.exists(container) then
+            os.cp("res/img/container.jpg", container)
+        end
+        awesomeface = path.join(target:targetdir(), "awesomeface.png")
+        if not os.exists(awesomeface) then
+            os.cp("res/img/awesomeface.png", awesomeface)
+        end
     end)
 
 target("GodCamera")
@@ -217,8 +258,14 @@ target("GodCamera")
         add_links("user32", "gdi32", "shell32")
     end
     after_build(function (target)
-        os.cp("res/img/container.jpg", path.join(target:targetdir(), "container.jpg"))
-        os.cp("res/img/awesomeface.png", path.join(target:targetdir(), "awesomeface.png"))
+        container = path.join(target:targetdir(), "container.jpg")
+        if not os.exists(container) then
+            os.cp("res/img/container.jpg", container)
+        end
+        awesomeface = path.join(target:targetdir(), "awesomeface.png")
+        if not os.exists(awesomeface) then
+            os.cp("res/img/awesomeface.png", awesomeface)
+        end
     end)
 
 
@@ -282,8 +329,14 @@ target("LightingMaps")
         add_links("user32", "gdi32", "shell32")
     end
     after_build(function (target)
-        os.cp("res/img/container2.png", path.join(target:targetdir(), "container2.png"))
-        os.cp("res/img/container2_specular.png", path.join(target:targetdir(), "container2_specular.png"))
+        container = path.join(target:targetdir(), "container2.png")
+        if not os.exists(container) then
+            os.cp("res/img/container2.png", container)
+        end
+        specular = path.join(target:targetdir(), "container2_specular.png")
+        if not os.exists(specular) then
+            os.cp("res/img/container2_specular.png", specular)
+        end
     end)
 
 
@@ -302,8 +355,14 @@ target("DirectionalLight")
         add_links("user32", "gdi32", "shell32")
     end
     after_build(function (target)
-        os.cp("res/img/container2.png", path.join(target:targetdir(), "container2.png"))
-        os.cp("res/img/container2_specular.png", path.join(target:targetdir(), "container2_specular.png"))
+        container = path.join(target:targetdir(), "container2.png")
+        if not os.exists(container) then
+            os.cp("res/img/container2.png", container)
+        end
+        specular = path.join(target:targetdir(), "container2_specular.png")
+        if not os.exists(specular) then
+            os.cp("res/img/container2_specular.png", specular)
+        end
     end)
 
 target("PointLight")
@@ -321,8 +380,14 @@ target("PointLight")
         add_links("user32", "gdi32", "shell32")
     end
     after_build(function (target)
-        os.cp("res/img/container2.png", path.join(target:targetdir(), "container2.png"))
-        os.cp("res/img/container2_specular.png", path.join(target:targetdir(), "container2_specular.png"))
+        container = path.join(target:targetdir(), "container2.png")
+        if not os.exists(container) then
+            os.cp("res/img/container2.png", container)
+        end
+        specular = path.join(target:targetdir(), "container2_specular.png")
+        if not os.exists(specular) then
+            os.cp("res/img/container2_specular.png", specular)
+        end
     end)
 
 target("FlashLight")
@@ -340,8 +405,14 @@ target("FlashLight")
         add_links("user32", "gdi32", "shell32")
     end
     after_build(function (target)
-        os.cp("res/img/container2.png", path.join(target:targetdir(), "container2.png"))
-        os.cp("res/img/container2_specular.png", path.join(target:targetdir(), "container2_specular.png"))
+        container = path.join(target:targetdir(), "container2.png")
+        if not os.exists(container) then
+            os.cp("res/img/container2.png", container)
+        end
+        specular = path.join(target:targetdir(), "container2_specular.png")
+        if not os.exists(specular) then
+            os.cp("res/img/container2_specular.png", specular)
+        end
     end)
 
 target("MultipleLights")
@@ -359,6 +430,12 @@ target("MultipleLights")
         add_links("user32", "gdi32", "shell32")
     end
     after_build(function (target)
-        os.cp("res/img/container2.png", path.join(target:targetdir(), "container2.png"))
-        os.cp("res/img/container2_specular.png", path.join(target:targetdir(), "container2_specular.png"))
+        container = path.join(target:targetdir(), "container2.png")
+        if not os.exists(container) then
+            os.cp("res/img/container2.png", container)
+        end
+        specular = path.join(target:targetdir(), "container2_specular.png")
+        if not os.exists(specular) then
+            os.cp("res/img/container2_specular.png", specular)
+        end
     end)
